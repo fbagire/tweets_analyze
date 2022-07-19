@@ -144,7 +144,8 @@ class TweetDfExtractor:
     def find_hashtags(self) -> list:
         hashtags = []
         for tweet in self.tweets_list:
-            hashtags.append(", ".join([hashtag['text'] for hashtag in tweet['entities']['hashtags']]))
+            if 'entities' in tweet.keys() and 'hashtags' in tweet['entities'].keys():
+                hashtags.append(", ".join([hashtag['tag'] for hashtag in tweet['entities']['hashtags']]))
 
         return hashtags
 
@@ -161,8 +162,9 @@ class TweetDfExtractor:
     def find_mentions(self) -> list:
 
         mentions = []
-        for tw in self.tweets_list:
-            mentions.append(", ".join([mention['screen_name'] for mention in tw['entities']['user_mentions']]))
+        for tweet in self.tweets_list:
+            if 'entities' in tweet.keys() and 'mentions' in tweet['entities'].keys():
+                mentions.append(", ".join([mention['username'] for mention in tweet['entities']['mentions']]))
 
         return mentions
 
@@ -174,12 +176,20 @@ class TweetDfExtractor:
     def find_location(self) -> list:
         location = []
         for tweet in self.tweets_list:
-            location.append(tweet['user']['location'])
+            try:
+                location.append(tweet['author']['location'])
+            except KeyError:
+                pass
 
         return location
 
     def get_coordinates(self) -> list:
-        coordinates = [x['coordinates'] for x in self.tweets_list]
+        coordinates = []
+        # for tweet in self.tweets_list:
+        try:
+            coordinates = [x['coordinates'] for x in self.tweets_list]
+        except KeyError:
+            pass
         return coordinates
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:
@@ -220,6 +230,7 @@ class TweetDfExtractor:
                     'possibly_sensitive': sensitivity, 'hashtags': hashtags,
                     'retweet_hashtags': retweet_hashtags, 'user_mentions': mentions, 'place': location,
                     'place_coord_boundaries': coordinates}
+
         df = pd.DataFrame(data=data_dic)
 
         if save:
@@ -232,5 +243,5 @@ class TweetDfExtractor:
 if __name__ == "__main__":
     _, tweet_list = read_json("data/tweets_flat.json")
 
-    tweet = TweetDfExtractor(tweet_list)
-    df = tweet.get_tweet_df()
+    tweety = TweetDfExtractor(tweet_list)
+    df = tweety.get_tweet_df()
