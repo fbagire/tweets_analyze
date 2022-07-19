@@ -50,7 +50,12 @@ class TweetDfExtractor:
         for tweet in self.tweets_list:
             if 'extended_tweet' in tweet.keys():
                 # Store the extended tweet text if the tweet is a thread otherwise store just the text'
-                text.append(tweet['extended_tweet']['full_text'])
+                text.append(tweet['extended_tweet']['text'])
+            elif 'referenced_tweets' in tweet.keys():
+                try:
+                    text.append(tweet['referenced_tweets'][0]['text'])
+                except KeyError:
+                    continue
             else:
                 text.append(tweet['text'])
         return text
@@ -119,23 +124,24 @@ class TweetDfExtractor:
 
         return is_sensitive
 
-    def find_favourite_count(self) -> list:
-        favorite_count = []
+    def find_likes_count(self) -> list:
+        likes_count = []
         for tweet in self.tweets_list:
-            if 'retweeted_status' in tweet.keys():
-                favorite_count.append(tweet['retweeted_status']['favorite_count'])
-            else:
-                favorite_count.append(0)
+            try:
+                likes_count.append(tweet['public_metrics']['like_count'])
+            except KeyError:
+                likes_count.append(0)
 
-        return favorite_count
+        return likes_count
 
     def find_retweet_count(self) -> list:
 
         retweet_count = []
         for tweet in self.tweets_list:
-            if 'retweeted_status' in tweet.keys():
-                retweet_count.append(tweet['retweeted_status']['retweet_count'])
-            else:
+            # if 'public_metrics' in tweet.keys():
+            try:
+                retweet_count.append(tweet['public_metrics']['retweet_count'])
+            except KeyError:
                 retweet_count.append(0)
 
         return retweet_count
@@ -193,11 +199,11 @@ class TweetDfExtractor:
         return coordinates
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:
-        save = True
+        save = False
         """required column to be generated you should be creative and add more features"""
         columns = ['created_at', 'source', 'original_text', 'cleaned_text', 'polarity', 'polarity_clean',
                    'subjectivity', 'subjectivity_clean', 'lang',
-                   'favorite_count',
+                   'likes_count',
                    'retweet_count',
                    'original_author', 'followers_count', 'friends_count', 'possibly_sensitive', 'hashtags',
                    'user_mentions', 'place']
@@ -225,7 +231,7 @@ class TweetDfExtractor:
 
         data_dic = {'created_at': created_at, 'source': source, 'original_text': text, 'cleaned_text': text_new,
                     'polarity': polarity, 'subjectivity': subjectivity, 'sentiment': sentiment, 'lang': lang,
-                    'favorite_count': fav_count, 'retweet_count': retweet_count, 'original_author': screen_name,
+                    'likes_count': fav_count, 'retweet_count': retweet_count, 'original_author': screen_name,
                     'followers_count': follower_count, 'friends_count': friends_count,
                     'possibly_sensitive': sensitivity, 'hashtags': hashtags,
                     'retweet_hashtags': retweet_hashtags, 'user_mentions': mentions, 'place': location,
