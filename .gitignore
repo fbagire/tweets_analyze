@@ -2,3 +2,5 @@
 *.jsonl
 *.json
 *.csv
+*.txt
+*.log
