@@ -140,6 +140,7 @@ class TweetDfExtractor:
 
         return retweet_count
 
+    ############################################################
     def find_hashtags(self) -> list:
         hashtags = []
         for tweet in self.tweets_list:
