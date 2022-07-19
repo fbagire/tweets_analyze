@@ -231,8 +231,8 @@ class TweetDfExtractor:
                     'retweet_hashtags': retweet_hashtags, 'user_mentions': mentions, 'place': location,
                     'place_coord_boundaries': coordinates}
 
-        df = pd.DataFrame(data=data_dic)
-
+        df = pd.DataFrame.from_dict(data_dic, orient='index')
+        df = df.transpose()
         if save:
             df.to_csv('processed_tweet_data.csv', index=False)
             print('File Successfully Saved.!!!')
