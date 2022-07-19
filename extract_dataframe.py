@@ -217,7 +217,7 @@ class TweetDfExtractor:
         polarity, subjectivity, _ = self.find_sentiments(text)
         _, _, sentiment = self.find_sentiments(text)
         lang = self.find_lang()
-        fav_count = self.find_favourite_count()
+        likes_count = self.find_likes_count()
         retweet_count = self.find_retweet_count()
         screen_name = self.find_screen_name()
         follower_count = self.find_followers_count()
@@ -231,7 +231,7 @@ class TweetDfExtractor:
 
         data_dic = {'created_at': created_at, 'source': source, 'original_text': text, 'cleaned_text': text_new,
                     'polarity': polarity, 'subjectivity': subjectivity, 'sentiment': sentiment, 'lang': lang,
-                    'likes_count': fav_count, 'retweet_count': retweet_count, 'original_author': screen_name,
+                    'likes_count': likes_count, 'retweet_count': retweet_count, 'original_author': screen_name,
                     'followers_count': follower_count, 'friends_count': friends_count,
                     'possibly_sensitive': sensitivity, 'hashtags': hashtags,
                     'retweet_hashtags': retweet_hashtags, 'user_mentions': mentions, 'place': location,
