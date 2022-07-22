@@ -35,7 +35,7 @@ class CleanTweets:
         """
         drop duplicated rows
         """
-        df = df.drop_duplicates(subset=['original_text'])
+        df = df.drop_duplicates()
 
         return df
 
@@ -66,7 +66,7 @@ class CleanTweets:
         remove non english tweets from lang
         """
 
-        df.query("lang == 'en' | lang =='fr' ", inplace=True)
+        df.query("lang == 'en' ", inplace=True)
 
         return df
 
