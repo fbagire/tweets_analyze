@@ -20,7 +20,7 @@ df_tweet = cleaner.drop_unwanted_column(df_tweet)
 df_tweet = cleaner.drop_duplicate(df_tweet)
 df_tweet = cleaner.convert_to_datetime(df_tweet)
 df_tweet = cleaner.convert_to_numbers(df_tweet)
-
+df_tweet = cleaner.treat_special_characters(df_tweet)
 # df_tweet = cleaner.remove_non_english_tweets(df_tweet)
 # df_tweet = cleaner.treat_special_characters(df_tweet)
 
@@ -124,19 +124,24 @@ d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by
                                                                               ascending=True).drop_duplicates(
     subset=['original_author'], keep='first')
 
-left_column1, right_column1 = st.columns(2)
+left_column1, middle_column1, right_column1 = st.columns(3)
 most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author', x='followers_count',
                        orientation='h')
 # most_flwd_plt.update_traces(texttemplate='%{text:.2s}', textfont_size=20)
 with left_column1:
     st.subheader("Most followed Accounts")
-left_column1.plotly_chart(most_flwd_plt)
+left_column1.plotly_chart(most_flwd_plt,use_container_width=True)
 
-d_mostloc = df_selection['place'].value_counts(ascending=False)
-most_loc_plt = px.bar()
-with right_column1:
+d_mostloc = pd.DataFrame(df_selection['place'].value_counts(ascending=True)).reset_index()
+most_loc_plt = px.bar(d_mostloc[len(d_mostloc) - 10:len(d_mostloc) + 1], y='index', x='place', orientation='h')
+with middle_column1:
     st.subheader("Location by Most Tweets")
-    right_column1.plotly_chart(most_loc_plt)
+middle_column1.plotly_chart(most_loc_plt,use_container_width=True)
+
+with right_column1:
+    st.subheader("WordCloud:Most Frequent Words In Tweets")
+
+right_column1.image('cw_rdf.png', use_column_width=True)
 
 st.markdown("---")
 

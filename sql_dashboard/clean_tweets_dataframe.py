@@ -1,4 +1,5 @@
 import pandas as pd
+import string
 
 
 class CleanTweets:
@@ -35,7 +36,7 @@ class CleanTweets:
         """
         drop duplicated rows
         """
-        df = df.drop_duplicates()
+        df = df.drop_duplicates(subset=['cleaned_text'])
 
         return df
 
@@ -66,7 +67,17 @@ class CleanTweets:
         remove non english tweets from lang
         """
 
-        df.query("lang == 'en' ", inplace=True)
+        df.query("lang == 'en' | lang =='fr' ", inplace=True)
+
+        return df
+
+    def treat_special_characters(self, df: pd.DataFrame) -> pd.DataFrame:
+        """"
+        Remove special characters and redundant characters which cause one location to come out many times
+        """
+        df['place'] = df['place'].str.capitalize()
+        df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
+        df['place'] = df['place'].replace(r'(^.*igali.*)|(^.*wanda.*)', value='Rwanda', regex=True)
 
         return df
 
