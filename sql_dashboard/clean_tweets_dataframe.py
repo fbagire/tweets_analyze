@@ -77,7 +77,7 @@ class CleanTweets:
         """
         df['place'] = df['place'].str.capitalize()
         df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
-        df['place'] = df['place'].replace(r'(^.*igali.*)|(^.*wanda.*)', value='Rwanda', regex=True)
+        df['place'] = df['place'].replace(r'(^.*[kK]igali.*)|(^.*wanda.*)', value='Rwanda', regex=True)
 
         return df
 

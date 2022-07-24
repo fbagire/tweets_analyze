@@ -25,40 +25,13 @@ df_tweet = cleaner.treat_special_characters(df_tweet)
 # df_tweet = cleaner.treat_special_characters(df_tweet)
 
 
-# def remove_non_english_tweets(df):
-#     """
-#     remove non english tweets from lang
-#     """
-#
-#     df.query("lang == 'en' | lang =='fr' ", inplace=True)
-#
-#     return df
-
-
-# df_tweet = remove_non_english_tweets(df_tweet)
-
-
-# def treat_special_characters(df):
-#     """"
-#     Remove special characters and redundant characters which cause one location to come out many times
-#     """
-#     df['place'] = df['place'].str.capitalize()
-#     df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
-#     df['place'] = df['place'].replace(r'(^.*igali.*)|(^.*wanda.*)', value='Rwanda', regex=True)
-#
-#     return df
-
-
-# df_tweet = treat_special_characters(df_tweet)
-
-
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
 
 lang = st.sidebar.multiselect(
     "Select the language:",
     options=df_tweet["lang"].unique(),
-    default=['en']
+    default=['en', 'fr']
 )
 
 df_selection = df_tweet.query("lang ==@lang")
@@ -68,14 +41,8 @@ st.markdown("##")
 
 # Sentiment Analysis Summary
 
-left_column, middle_column, right_column = st.columns(3)
-with left_column:
-    st.subheader("Average Polarity and Subjectivity Over time:")
-with middle_column:
-    st.subheader("Top 10 Hashtags by language (default: english)")
-with right_column:
-    st.subheader("Sentiment class distribution:")
-st.markdown("""---""")
+
+# st.markdown("""---""")
 
 text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 
@@ -115,9 +82,18 @@ hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x
 hashtags_top.update_traces(texttemplate='%{text:.s}')
 
 left_column, middle_column, right_column = st.columns(3)
-left_column.plotly_chart(sent_over_time, use_container_width=True)
-middle_column.plotly_chart(hashtags_top, use_container_width=True)
-right_column.plotly_chart(fig_product_sales, use_container_width=True)
+
+with left_column:
+    st.markdown("#### Average Polarity and Subjectivity Over Time")
+    left_column.plotly_chart(sent_over_time, use_container_width=True)
+
+# left_column, middle_column, right_column = st.columns(3)
+with middle_column:
+    st.markdown("#### Top 10 Hashtags")
+    middle_column.plotly_chart(hashtags_top, use_container_width=True)
+with right_column:
+    st.markdown("#### Sentiment Category Distribution")
+    right_column.plotly_chart(fig_product_sales, use_container_width=True)
 
 st.markdown("---")
 d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
@@ -127,19 +103,19 @@ d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by
 left_column1, middle_column1, right_column1 = st.columns(3)
 most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author', x='followers_count',
                        orientation='h')
-# most_flwd_plt.update_traces(texttemplate='%{text:.2s}', textfont_size=20)
 with left_column1:
-    st.subheader("Most followed Accounts")
-left_column1.plotly_chart(most_flwd_plt,use_container_width=True)
+    st.markdown("#### Most followed Accounts")
+left_column1.plotly_chart(most_flwd_plt, use_container_width=True)
 
 d_mostloc = pd.DataFrame(df_selection['place'].value_counts(ascending=True)).reset_index()
-most_loc_plt = px.bar(d_mostloc[len(d_mostloc) - 30:len(d_mostloc) + 1], y='index', x='place', orientation='h')
+d_mostloc.rename(columns={"place": "count", "index": "place"}, inplace=True)
+most_loc_plt = px.bar(d_mostloc[len(d_mostloc) - 30:len(d_mostloc) + 1], y='place', x='count', orientation='h')
 with middle_column1:
-    st.subheader("Location by Most Tweets")
-middle_column1.plotly_chart(most_loc_plt,use_container_width=True)
+    st.markdown("#### Location by Most Tweets")
+middle_column1.plotly_chart(most_loc_plt, use_container_width=True)
 
 with right_column1:
-    st.subheader("WordCloud:Most Frequent Words In Tweets")
+    st.markdown("#### WordCloud:Most Frequent Words In Tweets")
 
 right_column1.image('cw_rdf.png', use_column_width=True)
 
