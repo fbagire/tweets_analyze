@@ -1,5 +1,5 @@
 import pandas as pd
-
+import string
 
 class CleanTweets:
     """
@@ -76,6 +76,9 @@ class CleanTweets:
         """
         df['place'] = df['place'].str.capitalize()
         df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
+        # df['cleaned_text'] = df['cleaned_text'].str.lower()
+        # df['cleaned_text'] = df['cleaned_text'].apply(
+        #     lambda x: x.translate(str.maketrans('', '', string.punctuation)))
 
         return df
 

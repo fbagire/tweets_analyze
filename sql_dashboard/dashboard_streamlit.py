@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from importlib import reload
 import plotly.express as px
-from translate import Translator
 import seaborn as sns
 import clean_tweets_dataframe as cld
 import re
@@ -52,10 +51,6 @@ def treat_special_characters(df):
 
 
 df_tweet = treat_special_characters(df_tweet)
-
-translator = Translator(from_lang="french", to_lang="english")
-
-# def translate_french_tweets(df):
 
 
 # ---- SIDEBAR ----
