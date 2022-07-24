@@ -133,7 +133,7 @@ with left_column1:
 left_column1.plotly_chart(most_flwd_plt,use_container_width=True)
 
 d_mostloc = pd.DataFrame(df_selection['place'].value_counts(ascending=True)).reset_index()
-most_loc_plt = px.bar(d_mostloc[len(d_mostloc) - 10:len(d_mostloc) + 1], y='index', x='place', orientation='h')
+most_loc_plt = px.bar(d_mostloc[len(d_mostloc) - 30:len(d_mostloc) + 1], y='index', x='place', orientation='h')
 with middle_column1:
     st.subheader("Location by Most Tweets")
 middle_column1.plotly_chart(most_loc_plt,use_container_width=True)
