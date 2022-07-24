@@ -21,36 +21,35 @@ df_tweet = cleaner.drop_duplicate(df_tweet)
 df_tweet = cleaner.convert_to_datetime(df_tweet)
 df_tweet = cleaner.convert_to_numbers(df_tweet)
 
-
 # df_tweet = cleaner.remove_non_english_tweets(df_tweet)
 # df_tweet = cleaner.treat_special_characters(df_tweet)
 
 
-def remove_non_english_tweets(df):
-    """
-    remove non english tweets from lang
-    """
-
-    df.query("lang == 'en' | lang =='fr' ", inplace=True)
-
-    return df
-
-
-df_tweet = remove_non_english_tweets(df_tweet)
+# def remove_non_english_tweets(df):
+#     """
+#     remove non english tweets from lang
+#     """
+#
+#     df.query("lang == 'en' | lang =='fr' ", inplace=True)
+#
+#     return df
 
 
-def treat_special_characters(df):
-    """"
-    Remove special characters and redundant characters which cause one location to come out many times
-    """
-    df['place'] = df['place'].str.capitalize()
-    df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
-    df['place'] = df['place'].replace(r'(^.*igali.*)|(^.*wanda.*)', value='Rwanda', regex=True)
-
-    return df
+# df_tweet = remove_non_english_tweets(df_tweet)
 
 
-df_tweet = treat_special_characters(df_tweet)
+# def treat_special_characters(df):
+#     """"
+#     Remove special characters and redundant characters which cause one location to come out many times
+#     """
+#     df['place'] = df['place'].str.capitalize()
+#     df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
+#     df['place'] = df['place'].replace(r'(^.*igali.*)|(^.*wanda.*)', value='Rwanda', regex=True)
+#
+#     return df
+
+
+# df_tweet = treat_special_characters(df_tweet)
 
 
 # ---- SIDEBAR ----
@@ -78,34 +77,32 @@ with right_column:
     st.subheader("Sentiment class distribution:")
 st.markdown("""---""")
 
-text_grouped = df_tweet.groupby('sentiment').count()['cleaned_text'].reset_index()
-# sns.countplot(x='sentiment', data=df_tweet)
+text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 
 fig_product_sales = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
-                           template="plotly_white", width=500, height=500
-                           )
+                           template="plotly_white", color='sentiment')
 fig_product_sales.update_layout(
     plot_bgcolor="rgba(0,0,0,0)",
     xaxis=(dict(showgrid=False)))
 
 # sentiment summary
-df_tweet_date = df_tweet.set_index('created_at')
+df_tweet_date = df_selection.set_index('created_at')
 df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
 
 # sentiment average per day
 sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'], width=500, height=500)
 
 # Top 10 Hashtags by language (default: english)
-hashtag_df = df_tweet[['original_text', 'hashtags', 'retweet_hashtags']]
+hashtag_df = df_selection[['original_text', 'hashtags', 'retweet_hashtags']]
 
 
-@st.cache  # 👈 This function will be cached
-def find_hashtags(df_tweet):
+# @st.cache  # 👈 This function will be cached
+def find_hashtags(df_tweets):
     '''This function will extract hashtags'''
-    return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweet)
+    return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweets)
 
 
-hashtag_df['hashtag_check'] = df_tweet.original_text.apply(find_hashtags)
+hashtag_df['hashtag_check'] = df_selection.original_text.apply(find_hashtags)
 hashtag_df.dropna(subset=['hashtag_check'], inplace=True)
 tags_list = list(hashtag_df['hashtag_check'])
 hashtags_list_df = pd.DataFrame([tag for tags_row in tags_list for tag in tags_row], columns=['hashtag'])
@@ -115,7 +112,7 @@ hash_plotdf = pd.DataFrame(
     hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
 hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag', orientation='h',
                       text='count', width=800)
-hashtags_top.update_traces(texttemplate='%{text:.2s}')
+hashtags_top.update_traces(texttemplate='%{text:.s}')
 
 left_column, middle_column, right_column = st.columns(3)
 left_column.plotly_chart(sent_over_time, use_container_width=True)
@@ -123,8 +120,8 @@ middle_column.plotly_chart(hashtags_top, use_container_width=True)
 right_column.plotly_chart(fig_product_sales, use_container_width=True)
 
 st.markdown("---")
-d_mostflwd = df_tweet[['original_author', 'followers_count']].sort_values(by='followers_count',
-                                                                          ascending=True).drop_duplicates(
+d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
+                                                                              ascending=True).drop_duplicates(
     subset=['original_author'], keep='first')
 
 left_column1, right_column1 = st.columns(2)
@@ -135,7 +132,7 @@ with left_column1:
     st.subheader("Most followed Accounts")
 left_column1.plotly_chart(most_flwd_plt)
 
-d_mostloc = df_tweet['place'].value_counts(ascending=False)
+d_mostloc = df_selection['place'].value_counts(ascending=False)
 most_loc_plt = px.bar()
 with right_column1:
     st.subheader("Location by Most Tweets")
