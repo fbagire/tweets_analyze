@@ -35,7 +35,7 @@ class CleanTweets:
         """
         drop duplicated rows
         """
-        df = df.drop_duplicates(subset=['original_text'])
+        df = df.drop_duplicates(subset=['clean_text'])
 
         return df
 
@@ -67,6 +67,15 @@ class CleanTweets:
         """
 
         df.query("lang == 'en' | lang =='fr' ", inplace=True)
+
+        return df
+
+    def treat_special_characters(self, df: pd.DataFrame) -> pd.DataFrame:
+        """"
+        Remove special characters and redundant characters which cause one location to come out many times
+        """
+        df['place'] = df['place'].str.capitalize()
+        df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
 
         return df
 
