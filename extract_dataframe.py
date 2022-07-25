@@ -199,7 +199,7 @@ class TweetDfExtractor:
         return coordinates
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:
-        save = False
+        save = True
         """required column to be generated you should be creative and add more features"""
         columns = ['created_at', 'source', 'original_text', 'cleaned_text', 'polarity', 'polarity_clean',
                    'subjectivity', 'subjectivity_clean', 'lang',

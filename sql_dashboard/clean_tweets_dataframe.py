@@ -58,16 +58,18 @@ class CleanTweets:
         df['polarity'] = pd.to_numeric(df['polarity'], errors='coerce')
         df['subjectivity'] = pd.to_numeric(df['subjectivity'], errors='coerce')
         df['retweet_count'] = pd.to_numeric(df['retweet_count'], errors='coerce')
-        df['favorite_count'] = pd.to_numeric(df['favorite_count'], errors='coerce')
+        df['likes_count'] = pd.to_numeric(df['likes_count'], errors='coerce')
 
         return df
 
-    def remove_non_english_tweets(self, df: pd.DataFrame) -> pd.DataFrame:
+    def remove_other_languages_tweets(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        remove non english tweets from lang
+        remove non english,french, kinyarwanda tweets from lang
         """
+        df['lang'] = df['lang'].replace('in', value='kiny')
+        df['lang'] = df['lang'].replace('tl', value='kiny')
 
-        df.query("lang == 'en' | lang =='fr' ", inplace=True)
+        df.query("lang == 'en' | lang =='fr' | lang == 'kiny' ", inplace=True)
 
         return df
 

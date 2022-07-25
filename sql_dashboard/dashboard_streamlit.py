@@ -2,18 +2,16 @@ import streamlit as st
 import pandas as pd
 from importlib import reload
 import plotly.express as px
-import seaborn as sns
 import clean_tweets_dataframe as cld
 import re
 
 reload(cld)
+
 st.set_page_config(page_title="Tweets Analysis Dashboard",
                    page_icon=":bar_chart:", layout="wide")
-st.markdown("##")
-st.markdown("<h1 style='text-align: center; color: grey;'>Tweets Analysis Dashboard</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: white;'> by Faith Bagire </h3>", unsafe_allow_html=True)
 
-df_tweet = pd.read_csv('processed_tweet_data.csv')
+df_tweet = pd.read_csv('processed_tweet_data.csv', index_col=0)
+
 # Data Preparation and Filtering
 cleaner = cld.CleanTweets(df_tweet)
 df_tweet = cleaner.drop_unwanted_column(df_tweet)
@@ -21,9 +19,8 @@ df_tweet = cleaner.drop_duplicate(df_tweet)
 df_tweet = cleaner.convert_to_datetime(df_tweet)
 df_tweet = cleaner.convert_to_numbers(df_tweet)
 df_tweet = cleaner.treat_special_characters(df_tweet)
-# df_tweet = cleaner.remove_non_english_tweets(df_tweet)
-# df_tweet = cleaner.treat_special_characters(df_tweet)
-
+df_tweet = df_tweet[df_tweet.original_author != 'republikaonline']
+df_tweet = df_tweet[df_tweet.original_author != 'dwnews']
 
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
@@ -31,10 +28,20 @@ st.sidebar.header("Please Filter Here:")
 lang = st.sidebar.multiselect(
     "Select the language:",
     options=df_tweet["lang"].unique(),
-    default=['en', 'fr']
+    default=['en', 'fr', 'kiny']
 )
 
 df_selection = df_tweet.query("lang ==@lang")
+
+start_date = df_selection.created_at.head(1)
+start_date = start_date.loc[start_date.index[0]].date()
+
+end_date = df_selection.created_at.tail(1)
+end_date = end_date.loc[end_date.index[0]].date()
+
+st.markdown("##")
+st.markdown("<h1 style='text-align: center; color: grey;'>Tweets Analysis Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'> by Faith Bagire </h3>", unsafe_allow_html=True)
 
 # ---- MAINPAGE ----
 st.markdown("##")
@@ -64,8 +71,10 @@ hashtag_df = df_selection[['original_text', 'hashtags', 'retweet_hashtags']]
 
 
 # @st.cache  # 👈 This function will be cached
+
+
 def find_hashtags(df_tweets):
-    '''This function will extract hashtags'''
+    """This function will extract hashtags"""
     return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweets)
 
 
@@ -84,15 +93,15 @@ hashtags_top.update_traces(texttemplate='%{text:.s}')
 left_column, middle_column, right_column = st.columns(3)
 
 with left_column:
-    st.markdown("#### Average Polarity and Subjectivity Over Time")
+    st.markdown("<h4 style= 'text-align: center'> Average Polarity and Subjectivity Over Time </h4>",
+                unsafe_allow_html=True)
     left_column.plotly_chart(sent_over_time, use_container_width=True)
 
-# left_column, middle_column, right_column = st.columns(3)
 with middle_column:
-    st.markdown("#### Top 10 Hashtags")
+    st.markdown("<h4 style= 'text-align: center'> Top 10 Hashtags </h4>", unsafe_allow_html=True)
     middle_column.plotly_chart(hashtags_top, use_container_width=True)
 with right_column:
-    st.markdown("#### Sentiment Category Distribution")
+    st.markdown("<h4 style= 'text-align: center'> Sentiment Category Distribution </h4>", unsafe_allow_html=True)
     right_column.plotly_chart(fig_product_sales, use_container_width=True)
 
 st.markdown("---")
@@ -100,18 +109,24 @@ d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by
                                                                               ascending=True).drop_duplicates(
     subset=['original_author'], keep='first')
 
+d_mostflwd['username_link'] = d_mostflwd['original_author'].apply(
+    lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
+
 left_column1, middle_column1, right_column1 = st.columns(3)
 most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author', x='followers_count',
                        orientation='h')
 with left_column1:
-    st.markdown("#### Most followed Accounts")
+    st.markdown("<h4 style= 'text-align: center'> Most followed Accounts </h4>", unsafe_allow_html=True)
+
 left_column1.plotly_chart(most_flwd_plt, use_container_width=True)
+for i in range(len(d_mostflwd)-1, len(d_mostflwd) - 10, -1):
+    st.markdown(d_mostflwd['username_link'].iloc[i])
 
 d_mostloc = pd.DataFrame(df_selection['place'].value_counts(ascending=True)).reset_index()
 d_mostloc.rename(columns={"place": "count", "index": "place"}, inplace=True)
 most_loc_plt = px.bar(d_mostloc[len(d_mostloc) - 30:len(d_mostloc) + 1], y='place', x='count', orientation='h')
 with middle_column1:
-    st.markdown("#### Location by Most Tweets")
+    st.markdown("<h4 style= 'text-align: center'> Location by Most Tweets</h4>", unsafe_allow_html=True)
 middle_column1.plotly_chart(most_loc_plt, use_container_width=True)
 
 with right_column1:
@@ -122,6 +137,8 @@ right_column1.image('cw_rdf.png', use_column_width=True)
 st.markdown("---")
 
 st.caption("Source Data")
+# st.markdown("[Hekk](https://plot.ly/)")
+
 st.dataframe(df_selection)
 
 # ---- HIDE STREAMLIT STYLE ----
