@@ -53,9 +53,9 @@ st.markdown("##")
 
 text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 
-fig_product_sales = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
-                           template="plotly_white", color='sentiment')
-fig_product_sales.update_layout(
+fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
+                   template="plotly_white", color='sentiment')
+fig_senti.update_layout(
     plot_bgcolor="rgba(0,0,0,0)",
     xaxis=(dict(showgrid=False)))
 
@@ -102,7 +102,7 @@ with middle_column:
     middle_column.plotly_chart(hashtags_top, use_container_width=True)
 with right_column:
     st.markdown("<h4 style= 'text-align: center'> Sentiment Category Distribution </h4>", unsafe_allow_html=True)
-    right_column.plotly_chart(fig_product_sales, use_container_width=True)
+    right_column.plotly_chart(fig_senti, use_container_width=True)
 
 st.markdown("---")
 d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
@@ -119,7 +119,7 @@ with left_column1:
     st.markdown("<h4 style= 'text-align: center'> Most followed Accounts </h4>", unsafe_allow_html=True)
 
 left_column1.plotly_chart(most_flwd_plt, use_container_width=True)
-for i in range(len(d_mostflwd)-1, len(d_mostflwd) - 10, -1):
+for i in range(len(d_mostflwd) - 1, len(d_mostflwd) - 10, -1):
     st.markdown(d_mostflwd['username_link'].iloc[i])
 
 d_mostloc = pd.DataFrame(df_selection['place'].value_counts(ascending=True)).reset_index()
@@ -134,6 +134,19 @@ with right_column1:
 
 right_column1.image('cw_rdf.png', use_column_width=True)
 
+## Negative Tweeps
+st.markdown("---")
+df_neg = df_selection.query('sentiment=="Negative"')
+df_neg = df_neg.groupby(by=['original_author']).aggregate(
+    {'cleaned_text': 'count', 'likes_count': 'mean', 'followers_count': 'mean', 'friends_count': 'mean'})
+
+df_neg.reset_index(inplace=True)
+
+df_neg.rename(columns={'cleaned_text': 'negative_tweets'}, inplace=True)
+
+left3, right3 = st.columns(2)
+with left3:
+    st.dataframe(df_neg)
 st.markdown("---")
 
 st.caption("Source Data")
