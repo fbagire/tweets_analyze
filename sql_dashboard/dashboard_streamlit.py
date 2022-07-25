@@ -137,7 +137,6 @@ right_column1.image('cw_rdf.png', use_column_width=True)
 st.markdown("---")
 
 st.caption("Source Data")
-# st.markdown("[Hekk](https://plot.ly/)")
 
 st.dataframe(df_selection)
 
