@@ -39,3 +39,10 @@
 2022-07-26 14:32:06,684 INFO getting ('https://api.twitter.com/1.1/search/tweets.json',) {'params': {'count': 100, 'q': 'to:MugabeR60646616', 'include_ext_alt_text': 'true', 'include_entities': 'true', 'since_id': '1548789178011353087', 'result_type': 'recent', 'tweet_mode': 'extended'}}
 2022-07-26 14:32:06,986 INFO no new tweets matching {'count': 100, 'q': 'to:MugabeR60646616', 'include_ext_alt_text': 'true', 'include_entities': 'true', 'since_id': '1548789178011353087', 'result_type': 'recent', 'tweet_mode': 'extended'}
 2022-07-26 14:32:06,987 INFO prune=()
+2022-07-27 19:53:38,695 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-27 19:53:38,706 INFO creating http session
+2022-07-27 19:53:38,707 INFO creating OAuth1 user authentication
+2022-07-27 19:53:38,707 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-27 19:53:40,531 INFO looking up users EtudesRwanda
+2022-07-27 19:53:40,532 INFO getting ('https://api.twitter.com/1.1/users/lookup.json',) {'params': {'screen_name': 'EtudesRwanda', 'tweet_mode': 'extended'}}
+2022-07-27 19:53:40,852 INFO archived 1535192912132202498
