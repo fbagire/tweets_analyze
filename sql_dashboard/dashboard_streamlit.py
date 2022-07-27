@@ -11,19 +11,32 @@ reload(cld)
 st.set_page_config(page_title="Tweets Analysis Dashboard",
                    page_icon=":bar_chart:", layout="wide")
 
-# df_tweet = pd.read_csv('processed_tweet_data.csv', )
-df_tweet = pd.read_excel("processed_tweet_data.xlsx", engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
 
-# Data Preparation and Filtering
-cleaner = cld.CleanTweets(df_tweet)
-df_tweet = cleaner.drop_unwanted_column(df_tweet)
-df_tweet = cleaner.drop_duplicate(df_tweet)
-df_tweet = cleaner.convert_to_datetime(df_tweet)
-df_tweet = cleaner.convert_to_numbers(df_tweet)
-df_tweet = cleaner.treat_special_characters(df_tweet)
-df_tweet = df_tweet[df_tweet.original_author != 'republikaonline']
-df_tweet = df_tweet[df_tweet.original_author != 'dwnews']
+@st.cache
+def read_data(filename):
+    df_func = pd.read_excel(filename, engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
+    return df_func
 
+
+df_tweet_og = read_data(filename="processed_tweet_data.xlsx")
+cleaner = cld.CleanTweets(df_tweet_og)
+
+
+@st.cache
+def clean_data(df_to_clean):
+    # Data Preparation and Filtering
+    df_to_clean = cleaner.drop_unwanted_column(df_to_clean)
+    df_to_clean = cleaner.drop_duplicate(df_to_clean)
+    df_to_clean = cleaner.convert_to_datetime(df_to_clean)
+    df_to_clean = cleaner.convert_to_numbers(df_to_clean)
+    df_to_clean = cleaner.treat_special_characters(df_to_clean)
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'republikaonline']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'dwnews']
+
+    return df_to_clean
+
+
+df_tweet = clean_data(df_tweet_og)
 # df_tweet.drop(['', 'retweet_hashtags'], axis=1, inplace=True)
 
 # ---- SIDEBAR ----
@@ -47,7 +60,7 @@ st.markdown("##")
 st.markdown("<h1 style='text-align: center; color: grey;'>Tweets Analysis Dashboard</h1>", unsafe_allow_html=True)
 # st.markdown("<h3 style='text-align: center; color: white;'> start_date </h3>", unsafe_allow_html=True)
 
-"___________________________________From Week of " + str(end_date) + " // " + str(start_date) + " ____ by Faith Bagire"
+"___________________________________From Week of " + str(end_date) + " // " + str(start_date) + " by Faith Bagire"
 # ---- MAINPAGE ----
 st.markdown("##")
 
@@ -163,7 +176,7 @@ st.markdown("---")
 st.caption("Source Data")
 
 #
-
+df_selection = df_selection[df_selection.columns.difference(['original_text', 'polarity', 'subjectivity', 'source'])]
 gb = GridOptionsBuilder.from_dataframe(df_selection)
 gb.configure_pagination(paginationAutoPageSize=True)  # Add pagination
 gb.configure_side_bar()  # Add a sidebar
@@ -176,8 +189,9 @@ grid_response = AgGrid(
     data_return_mode='AS_INPUT',
     update_mode='MODEL_CHANGED',
     fit_columns_on_grid_load=False,
-    theme='blue',  # Add theme color to the table
+    theme='dark',  # Add theme color to the table
     enable_enterprise_modules=True,
+    height=700,
     reload_data=True
 )
 
