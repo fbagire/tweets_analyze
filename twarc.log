@@ -1,0 +1,41 @@
+2022-07-26 14:08:30,828 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:14:11,679 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:16:51,330 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:16:51,330 INFO creating http session
+2022-07-26 14:16:51,330 INFO creating OAuth1 user authentication
+2022-07-26 14:16:51,330 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:16:52,971 INFO getting ('https://api.twitter.com/1.1/trends/available.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:18:29,481 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:18:29,488 INFO creating http session
+2022-07-26 14:18:29,488 INFO creating OAuth1 user authentication
+2022-07-26 14:18:29,490 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:18:31,208 INFO getting ('https://api.twitter.com/1.1/trends/place.json',) {'params': {'id': 'trends_woeid.json', 'tweet_mode': 'extended'}}
+2022-07-26 14:18:31,586 INFO no region matching WOEID trends_woeid.json
+2022-07-26 14:23:53,134 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:23:53,136 INFO creating http session
+2022-07-26 14:23:53,136 INFO creating OAuth1 user authentication
+2022-07-26 14:23:53,137 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:23:55,692 INFO getting ('https://api.twitter.com/1.1/trends/available.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:25:19,062 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:25:19,062 INFO creating http session
+2022-07-26 14:25:19,062 INFO creating OAuth1 user authentication
+2022-07-26 14:25:19,062 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:25:21,256 INFO getting ('https://api.twitter.com/1.1/trends/place.json',) {'params': {'id': '\\-1.970579,30.104429', 'tweet_mode': 'extended'}}
+2022-07-26 14:25:21,526 INFO no region matching WOEID \-1.970579,30.104429
+2022-07-26 14:26:25,159 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:26:25,159 INFO creating http session
+2022-07-26 14:26:25,159 INFO creating OAuth1 user authentication
+2022-07-26 14:26:25,159 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:26:26,932 INFO getting ('https://api.twitter.com/1.1/trends/closest.json',) {'params': {'lat': 39.9062, 'long': -79.4679, 'tweet_mode': 'extended'}}
+2022-07-26 14:26:28,013 INFO getting ('https://api.twitter.com/1.1/trends/place.json',) {'params': {'id': 2473224, 'tweet_mode': 'extended'}}
+2022-07-26 14:32:03,465 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-26 14:32:03,473 INFO creating http session
+2022-07-26 14:32:03,474 INFO creating OAuth1 user authentication
+2022-07-26 14:32:03,478 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-26 14:32:06,188 INFO hydrating ['1548789178011353088']
+2022-07-26 14:32:06,190 INFO posting ('https://api.twitter.com/1.1/statuses/lookup.json',) {'data': {'id': '1548789178011353088', 'include_ext_alt_text': 'true', 'include_entities': 'true', 'trim_user': False, 'tweet_mode': 'extended'}}
+2022-07-26 14:32:06,679 INFO archived 1548789178011353088
+2022-07-26 14:32:06,679 INFO looking for replies to: 1548789178011353088
+2022-07-26 14:32:06,684 INFO getting ('https://api.twitter.com/1.1/search/tweets.json',) {'params': {'count': 100, 'q': 'to:MugabeR60646616', 'include_ext_alt_text': 'true', 'include_entities': 'true', 'since_id': '1548789178011353087', 'result_type': 'recent', 'tweet_mode': 'extended'}}
+2022-07-26 14:32:06,986 INFO no new tweets matching {'count': 100, 'q': 'to:MugabeR60646616', 'include_ext_alt_text': 'true', 'include_entities': 'true', 'since_id': '1548789178011353087', 'result_type': 'recent', 'tweet_mode': 'extended'}
+2022-07-26 14:32:06,987 INFO prune=()

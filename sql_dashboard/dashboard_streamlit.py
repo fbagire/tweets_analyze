@@ -4,13 +4,15 @@ from importlib import reload
 import plotly.express as px
 import clean_tweets_dataframe as cld
 import re
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
 
 reload(cld)
 
 st.set_page_config(page_title="Tweets Analysis Dashboard",
                    page_icon=":bar_chart:", layout="wide")
 
-df_tweet = pd.read_csv('processed_tweet_data.csv', index_col=0)
+# df_tweet = pd.read_csv('processed_tweet_data.csv', )
+df_tweet = pd.read_excel("processed_tweet_data.xlsx", engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
 
 # Data Preparation and Filtering
 cleaner = cld.CleanTweets(df_tweet)
@@ -21,6 +23,8 @@ df_tweet = cleaner.convert_to_numbers(df_tweet)
 df_tweet = cleaner.treat_special_characters(df_tweet)
 df_tweet = df_tweet[df_tweet.original_author != 'republikaonline']
 df_tweet = df_tweet[df_tweet.original_author != 'dwnews']
+
+# df_tweet.drop(['', 'retweet_hashtags'], axis=1, inplace=True)
 
 # ---- SIDEBAR ----
 st.sidebar.header("Please Filter Here:")
@@ -41,8 +45,9 @@ end_date = end_date.loc[end_date.index[0]].date()
 
 st.markdown("##")
 st.markdown("<h1 style='text-align: center; color: grey;'>Tweets Analysis Dashboard</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: white;'> by Faith Bagire </h3>", unsafe_allow_html=True)
+# st.markdown("<h3 style='text-align: center; color: white;'> start_date </h3>", unsafe_allow_html=True)
 
+"___________________________________From Week of " + str(end_date) + " // " + str(start_date) + " ____ by Faith Bagire"
 # ---- MAINPAGE ----
 st.markdown("##")
 
@@ -134,16 +139,22 @@ with right_column1:
 
 right_column1.image('cw_rdf.png', use_column_width=True)
 
-## Negative Tweeps
-st.markdown("---")
-df_neg = df_selection.query('sentiment=="Negative"')
+sent_choice = st.selectbox("Select Sentiment to See",
+                           ("Positive", "Negative", "Neutral"))
+# Negative Tweeps
+
+
+# if sent_choice=="Positive":
+
+df_neg = df_selection.query('sentiment==@sent_choice')
 df_neg = df_neg.groupby(by=['original_author']).aggregate(
     {'cleaned_text': 'count', 'likes_count': 'mean', 'followers_count': 'mean', 'friends_count': 'mean'})
 
 df_neg.reset_index(inplace=True)
 
-df_neg.rename(columns={'cleaned_text': 'negative_tweets'}, inplace=True)
-
+df_neg.rename(columns={'cleaned_text': str(sent_choice) + '_tweets'}, inplace=True)
+#
+st.markdown("---")
 left3, right3 = st.columns(2)
 with left3:
     st.dataframe(df_neg)
@@ -151,8 +162,31 @@ st.markdown("---")
 
 st.caption("Source Data")
 
-st.dataframe(df_selection)
+#
 
+gb = GridOptionsBuilder.from_dataframe(df_selection)
+gb.configure_pagination(paginationAutoPageSize=True)  # Add pagination
+gb.configure_side_bar()  # Add a sidebar
+gb.configure_selection('multiple', use_checkbox=True,
+                       groupSelectsChildren="Group checkbox select children")  # Enable multi-row selection
+gridOptions = gb.build()
+grid_response = AgGrid(
+    df_selection,
+    gridOptions=gridOptions,
+    data_return_mode='AS_INPUT',
+    update_mode='MODEL_CHANGED',
+    fit_columns_on_grid_load=False,
+    theme='blue',  # Add theme color to the table
+    enable_enterprise_modules=True,
+    height=350,
+    reload_data=True
+)
+
+df_selection = grid_response['data']
+selected = grid_response['selected_rows']
+df = pd.DataFrame(selected)  # Pass the selected rows to a new dataframe df
+
+#
 # ---- HIDE STREAMLIT STYLE ----
 hide_st_style = """
             <style>

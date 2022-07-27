@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 from textblob import TextBlob
+import numpy as np
 import re
 
 
@@ -48,16 +49,16 @@ class TweetDfExtractor:
     def find_full_text(self) -> list:
         text = []
         for tweet in self.tweets_list:
-            if 'extended_tweet' in tweet.keys():
-                # Store the extended tweet text if the tweet is a thread otherwise store just the text'
-                text.append(tweet['extended_tweet']['text'])
-            elif 'referenced_tweets' in tweet.keys():
-                try:
-                    text.append(tweet['referenced_tweets'][0]['text'])
-                except KeyError:
-                    continue
-            else:
+
+            # if 'extended_tweet' in tweet.keys():
+            #     # Store the extended tweet text if the tweet is a thread otherwise store just the text'
+            #     text.append(tweet['extended_tweet']['text'])
+            if 'text' in tweet.keys():
                 text.append(tweet['text'])
+            elif 'referenced_tweets' in tweet.keys():
+                text.append(tweet['referenced_tweets'][0]['text'])
+            else:
+                text.append(np.nan)
         return text
 
     def text_cleaner(self, text: list) -> list:
@@ -106,15 +107,30 @@ class TweetDfExtractor:
         return source
 
     def find_screen_name(self) -> list:
-        screen_name = [x['author']['username'] for x in self.tweets_list]
+        screen_name = []
+        for tweet in self.tweets_list:
+            try:
+                screen_name.append(tweet['author']['username'])
+            except KeyError:
+                screen_name.append(np.nan)
         return screen_name
 
     def find_followers_count(self) -> list:
-        followers_count = [x['author']['public_metrics']['followers_count'] for x in self.tweets_list]
+        followers_count = []
+        for tweet in self.tweets_list:
+            try:
+                followers_count.append(tweet['author']['public_metrics']['followers_count'])
+            except KeyError:
+                followers_count.append(np.nan)
         return followers_count
 
     def find_friends_count(self) -> list:
-        friends_count = [x['author']['public_metrics']['following_count'] for x in self.tweets_list]
+        friends_count = []
+        for tweet in self.tweets_list:
+            try:
+                friends_count.append(tweet['author']['public_metrics']['following_count'])
+            except KeyError:
+                friends_count.append(np.nan)
         return friends_count
 
     def is_sensitive(self) -> list:
@@ -146,23 +162,27 @@ class TweetDfExtractor:
 
         return retweet_count
 
-    ############################################################
     def find_hashtags(self) -> list:
         hashtags = []
         for tweet in self.tweets_list:
             if 'entities' in tweet.keys() and 'hashtags' in tweet['entities'].keys():
                 hashtags.append(", ".join([hashtag['tag'] for hashtag in tweet['entities']['hashtags']]))
-
+            else:
+                hashtags.append(np.nan)
         return hashtags
 
     def find_retweet_hashtags(self) -> list:
         retweet_hashtags = []
         for tweet in self.tweets_list:
-            if 'retweeted_status' in tweet.keys():
-                retweet_hashtags.append(
-                    ", ".join([hashtag['text'] for hashtag in tweet['retweeted_status']['entities']['hashtags']]))
+            if 'referenced_tweets' in tweet.keys():
+                try:
+                    retweet_hashtags.append(", ".join(
+                        [hashtag['tag'] for hashtag in tweet['referenced_tweets'][0]['entities']['hashtags']]))
+                except:
+                    retweet_hashtags.append(np.nan)
             else:
-                retweet_hashtags.append(None)
+                retweet_hashtags.append(np.nan)
+
         return retweet_hashtags
 
     def find_mentions(self) -> list:
@@ -171,12 +191,18 @@ class TweetDfExtractor:
         for tweet in self.tweets_list:
             if 'entities' in tweet.keys() and 'mentions' in tweet['entities'].keys():
                 mentions.append(", ".join([mention['username'] for mention in tweet['entities']['mentions']]))
+            else:
+                mentions.append(np.nan)
 
         return mentions
 
     def find_lang(self) -> list:
-        lang = [x['lang'] for x in self.tweets_list]
-
+        lang = []
+        for tweet in self.tweets_list:
+            try:
+                lang.append(tweet['lang'])
+            except KeyError:
+                lang.append(np.nan)
         return lang
 
     def find_location(self) -> list:
@@ -185,30 +211,37 @@ class TweetDfExtractor:
             try:
                 location.append(tweet['author']['location'])
             except KeyError:
-                pass
-
+                location.append(np.nan)
         return location
 
-    def get_coordinates(self) -> list:
-        coordinates = []
-        # for tweet in self.tweets_list:
-        try:
-            coordinates = [x['coordinates'] for x in self.tweets_list]
-        except KeyError:
-            pass
-        return coordinates
+    def get_tweet_id(self) -> list:
+        tweet_id = []
+        for tweet in self.tweets_list:
+            try:
+                tweet_id.append(str(tweet['id']))
+            except KeyError:
+                tweet_id.append(np.nan)
+        return tweet_id
+
+    def get_tweet_url(self) -> list:
+        tweet_url = []
+        for tweet in self.tweets_list:
+            if 'referenced_tweets' in tweet:
+                try:
+                    tweet_url.append(", ".join([url['expanded_url'] for url in tweet['entities']['urls']]))
+                except KeyError:
+                    tweet_url.append(np.nan)
+            else:
+                tweet_url.append(np.nan)
+        return tweet_url
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:
         save = True
         """required column to be generated you should be creative and add more features"""
         columns = ['created_at', 'source', 'original_text', 'cleaned_text', 'polarity', 'polarity_clean',
-                   'subjectivity', 'subjectivity_clean', 'lang',
-                   'likes_count',
-                   'retweet_count',
+                   'subjectivity', 'subjectivity_clean', 'lang', 'likes_count', 'retweet_count',
                    'original_author', 'followers_count', 'friends_count', 'possibly_sensitive', 'hashtags',
-                   'user_mentions', 'place']
-
-        # columns to add = ['sentiment','screen_count']
+                   'user_mentions', 'place', 'tweet_url', 'tweet_id']
 
         created_at = self.find_created_time()
         source = self.find_source()
@@ -227,20 +260,21 @@ class TweetDfExtractor:
         retweet_hashtags = self.find_retweet_hashtags()
         mentions = self.find_mentions()
         location = self.find_location()
-        coordinates = self.get_coordinates()
+        tweet_url = self.get_tweet_url()
+        tweet_id = self.get_tweet_id()
 
         data_dic = {'created_at': created_at, 'source': source, 'original_text': text, 'cleaned_text': text_new,
                     'polarity': polarity, 'subjectivity': subjectivity, 'sentiment': sentiment, 'lang': lang,
                     'likes_count': likes_count, 'retweet_count': retweet_count, 'original_author': screen_name,
                     'followers_count': follower_count, 'friends_count': friends_count,
-                    'possibly_sensitive': sensitivity, 'hashtags': hashtags,
-                    'retweet_hashtags': retweet_hashtags, 'user_mentions': mentions, 'place': location,
-                    'place_coord_boundaries': coordinates}
+                    'possibly_sensitive': sensitivity, 'hashtags': hashtags, 'retweet_hashtags': retweet_hashtags,
+                    'user_mentions': mentions, 'place': location,
+                    'tweet_url': tweet_url, 'tweet_id': tweet_id}
 
         df = pd.DataFrame.from_dict(data_dic, orient='index')
         df = df.transpose()
         if save:
-            df.to_csv('processed_tweet_data.csv', index=False)
+            df.to_excel('processed_tweet_data.xlsx', index=False)
             print('File Successfully Saved.!!!')
 
         return df
