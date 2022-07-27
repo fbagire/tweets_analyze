@@ -12,6 +12,7 @@ st.set_page_config(page_title="Tweets Analysis Dashboard",
                    page_icon=":bar_chart:", layout="wide")
 
 
+# Cached function to Read and Clean the Data
 @st.cache
 def read_data(filename):
     df_func = pd.read_excel(filename, engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
@@ -50,6 +51,7 @@ lang = st.sidebar.multiselect(
 
 df_selection = df_tweet.query("lang ==@lang")
 
+# ----- Find the start and End date of the tweets under analysis ------
 start_date = df_selection.created_at.head(1)
 start_date = start_date.loc[start_date.index[0]].date()
 
@@ -65,9 +67,6 @@ st.markdown("<h1 style='text-align: center; color: grey;'>Tweets Analysis Dashbo
 st.markdown("##")
 
 # Sentiment Analysis Summary
-
-
-# st.markdown("""---""")
 
 text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 
@@ -88,9 +87,6 @@ sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 's
 hashtag_df = df_selection[['original_text', 'hashtags', 'retweet_hashtags']]
 
 
-# @st.cache  # 👈 This function will be cached
-
-
 def find_hashtags(df_tweets):
     """This function will extract hashtags"""
     return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweets)
@@ -108,6 +104,7 @@ hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x
                       text='count', width=800)
 hashtags_top.update_traces(texttemplate='%{text:.s}')
 
+# --- Make First Three Columns to print figures
 left_column, middle_column, right_column = st.columns(3)
 
 with left_column:
@@ -152,19 +149,14 @@ with right_column1:
 
 right_column1.image('cw_rdf.png', use_column_width=True)
 
+# ---Make a selection box fro either (Positive, Negative, Neutral)
 sent_choice = st.selectbox("Select Sentiment to See",
                            ("Positive", "Negative", "Neutral"))
-# Negative Tweeps
-
-
-# if sent_choice=="Positive":
 
 df_neg = df_selection.query('sentiment==@sent_choice')
 df_neg = df_neg.groupby(by=['original_author']).aggregate(
     {'cleaned_text': 'count', 'likes_count': 'mean', 'followers_count': 'mean', 'friends_count': 'mean'})
-
 df_neg.reset_index(inplace=True)
-
 df_neg.rename(columns={'cleaned_text': str(sent_choice) + '_tweets'}, inplace=True)
 #
 st.markdown("---")
@@ -173,9 +165,9 @@ with left3:
     st.dataframe(df_neg)
 st.markdown("---")
 
+# ---- Print Source Data at the Bottom of the Page -----
 st.caption("Source Data")
 
-#
 df_selection = df_selection[df_selection.columns.difference(['original_text', 'polarity', 'subjectivity', 'source'])]
 gb = GridOptionsBuilder.from_dataframe(df_selection)
 gb.configure_pagination(paginationAutoPageSize=True)  # Add pagination
