@@ -41,50 +41,50 @@ def clean_data(df_to_clean):
 
 
 df_tweet = clean_data(df_tweet_og)
-#
-# # start graphing
-#
-# text_grouped = df_tweet.groupby('sentiment').count()['cleaned_text'].reset_index()
-#
-# fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
-#                    template="plotly_white", color='sentiment')
-# fig_senti.update_layout(
-#     plot_bgcolor="rgba(0,0,0,0)",
-#     xaxis=(dict(showgrid=False)))
-#
-# # sentiment summary
-# df_tweet_date = df_tweet.set_index('created_at')
-# df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
-#
-# # sentiment average per day
-# sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'])
-#
-# # Top 10 Hashtags by language (default: english)
-# hashtag_df = df_tweet[['original_text', 'hashtags', 'retweet_hashtags']]
-#
-#
-# def find_hashtags(df_tweets):
-#     """This function will extract hashtags"""
-#     return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweets)
-#
-#
-# hashtag_df['hashtag_check'] = df_tweet.original_text.apply(find_hashtags)
-# hashtag_df.dropna(subset=['hashtag_check'], inplace=True)
-# tags_list = list(hashtag_df['hashtag_check'])
-# hashtags_list_df = pd.DataFrame([tag for tags_row in tags_list for tag in tags_row], columns=['hashtag'])
-# hashtags_list_df['hashtag'] = hashtags_list_df['hashtag'].str.lower()
-#
-# hash_plotdf = pd.DataFrame(
-#     hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
-# hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag', orientation='h',
-#                       text='count', width=800)
-# hashtags_top.update_traces(texttemplate='%{text:.s}')
+
+# start graphing
+
+text_grouped = df_tweet.groupby('sentiment').count()['cleaned_text'].reset_index()
+
+fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
+                   template="plotly_white", color='sentiment')
+fig_senti.update_layout(
+    plot_bgcolor="rgba(0,0,0,0)",
+    xaxis=(dict(showgrid=False)))
+
+# sentiment summary
+df_tweet_date = df_tweet.set_index('created_at')
+df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
+
+# sentiment average per day
+sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'])
+
+# Top 10 Hashtags by language (default: english)
+hashtag_df = df_tweet[['original_text', 'hashtags', 'retweet_hashtags']]
+
+
+def find_hashtags(df_tweets):
+    """This function will extract hashtags"""
+    return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweets)
+
+
+hashtag_df['hashtag_check'] = df_tweet.original_text.apply(find_hashtags)
+hashtag_df.dropna(subset=['hashtag_check'], inplace=True)
+tags_list = list(hashtag_df['hashtag_check'])
+hashtags_list_df = pd.DataFrame([tag for tags_row in tags_list for tag in tags_row], columns=['hashtag'])
+hashtags_list_df['hashtag'] = hashtags_list_df['hashtag'].str.lower()
+
+hash_plotdf = pd.DataFrame(
+    hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
+hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag', orientation='h',
+                      text='count', width=800)
+hashtags_top.update_traces(texttemplate='%{text:.s}')
 
 lang_lst = df_tweet.lang.dropna().unique()
 sent_lst = df_tweet.sentiment.dropna().unique()
 app.layout = html.Div(
-    dcc.Store(id='aggregate_data')
     [
+        dcc.Store(id='aggregate_data'),
         html.Div(
             [
                 html.H2('Twitter Analysis Dashboard', style={'textAlign': 'center', 'color': '#0F562F'}),
@@ -113,14 +113,14 @@ app.layout = html.Div(
                                        value='Positive'),
                     ], style={'width': '50%', 'display': 'flex'}
                 ),
-                # html.Div(
-                #     [
-                #         dcc.Graph(id='hashtags_plot'),
-                #         # figure=hashtags_top),
-                #         dcc.Graph(
-                #             id='sent_bar')
-                #         # figure=fig_senti)
-                #     ], style={'width': '30%', 'display': 'flex'})
+                html.Div(
+                    [
+                        dcc.Graph(id='hashtags_plot',
+                                  figure=hashtags_top),
+                        dcc.Graph(
+                            id='sent_bar',
+                            figure=fig_senti)
+                    ], style={'width': '30%', 'display': 'flex'})
             ])
     ], id="mainContainer",
     style={
@@ -132,7 +132,7 @@ app.layout = html.Div(
 # Helper Functions
 
 def filter_dataframe(df, lang_sel):
-    dff = df[df['Well_Status'].isin(lang_sel)]
+    dff = df[df['lang'].isin(lang_sel)]
     return dff
 
 
@@ -142,9 +142,6 @@ def get_selectedf(lang_sel):
     dff = filter_dataframe(df_tweet, lang_sel)
     return dff
 
-
-# className="container",
-# style={'width': '98%', 'margin-left': 10, 'margin-right': 10, 'max-width': 50000})
 
 #
 
