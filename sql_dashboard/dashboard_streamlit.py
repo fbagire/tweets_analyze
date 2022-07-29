@@ -57,15 +57,11 @@ start_date = start_date.loc[start_date.index[0]].date()
 
 end_date = df_selection.created_at.tail(1)
 end_date = end_date.loc[end_date.index[0]].date()
+st.markdown("<h1 style='text-align: center; color: grey'><font size='6'>Tweets Analysis Dashboard</font></h1>",
+            unsafe_allow_html=True)
 
-st.markdown("##")
-st.markdown("<h1 style='text-align: center; color: grey;'>Tweets Analysis Dashboard</h1>", unsafe_allow_html=True)
-# st.markdown("<h3 style='text-align: center; color: white;'> start_date </h3>", unsafe_allow_html=True)
-
-"___________________________________From Week of " + str(end_date) + " // " + str(start_date) + " by Faith Bagire"
 # ---- MAINPAGE ----
-st.markdown("##")
-
+# st.markdown("##")
 # Sentiment Analysis Summary
 
 text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
@@ -108,18 +104,20 @@ hashtags_top.update_traces(texttemplate='%{text:.s}')
 left_column, middle_column, right_column = st.columns(3)
 
 with left_column:
-    st.markdown("<h4 style= 'text-align: center'> Average Polarity and Subjectivity Over Time </h4>",
-                unsafe_allow_html=True)
+    st.markdown(
+        "<h4 style= 'text-align: center'><font size='3'> Average Polarity and Subjectivity Over Time </font></h4>",
+        unsafe_allow_html=True)
     left_column.plotly_chart(sent_over_time, use_container_width=True)
 
 with middle_column:
-    st.markdown("<h4 style= 'text-align: center'> Top 10 Hashtags </h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style= 'text-align: center'><font size='3'> Top 10 Hashtags </font> </h4>", unsafe_allow_html=True)
     middle_column.plotly_chart(hashtags_top, use_container_width=True)
 with right_column:
-    st.markdown("<h4 style= 'text-align: center'> Sentiment Category Distribution </h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style= 'text-align: center'><font size='3'> Sentiment Category Distribution</font> </h4>",
+                unsafe_allow_html=True)
     right_column.plotly_chart(fig_senti, use_container_width=True)
 
-st.markdown("---")
+# st.markdown("---")
 d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
                                                                               ascending=True).drop_duplicates(
     subset=['original_author'], keep='first')
@@ -131,7 +129,8 @@ left_column1, middle_column1, right_column1 = st.columns(3)
 most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author', x='followers_count',
                        orientation='h')
 with left_column1:
-    st.markdown("<h4 style= 'text-align: center'> Most followed Accounts </h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style= 'text-align: center'><font size='3'> Most followed Accounts </font></h4>",
+                unsafe_allow_html=True)
 
 left_column1.plotly_chart(most_flwd_plt, use_container_width=True)
 for i in range(len(d_mostflwd) - 1, len(d_mostflwd) - 10, -1):
@@ -141,12 +140,13 @@ d_mostloc = pd.DataFrame(df_selection['place'].value_counts(ascending=True)).res
 d_mostloc.rename(columns={"place": "count", "index": "place"}, inplace=True)
 most_loc_plt = px.bar(d_mostloc[len(d_mostloc) - 30:len(d_mostloc) + 1], y='place', x='count', orientation='h')
 with middle_column1:
-    st.markdown("<h4 style= 'text-align: center'> Location by Most Tweets</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style= 'text-align: center'><font size='3'> Location by Most Tweets</font></h4>",
+                unsafe_allow_html=True)
 middle_column1.plotly_chart(most_loc_plt, use_container_width=True)
 
 with right_column1:
-    st.markdown("#### WordCloud:Most Frequent Words In Tweets")
-
+    st.markdown("<h4 style= 'text-align: center'><font size='3'> WordCloud:Most Frequent Words In Tweets</font></h4>",
+                unsafe_allow_html=True)
 right_column1.image('cw_rdf.png', use_column_width=True)
 
 # ---Make a selection box fro either (Positive, Negative, Neutral)
@@ -168,7 +168,8 @@ st.markdown("---")
 # ---- Print Source Data at the Bottom of the Page -----
 st.caption("Source Data")
 
-df_selection = df_selection[df_selection.columns.difference(['original_text', 'polarity', 'subjectivity', 'source'])]
+df_selection = df_selection[
+    df_selection.columns.difference(['original_text', 'polarity', 'subjectivity', 'possibly_sensitive'])]
 gb = GridOptionsBuilder.from_dataframe(df_selection)
 gb.configure_pagination(paginationAutoPageSize=True)  # Add pagination
 gb.configure_side_bar()  # Add a sidebar

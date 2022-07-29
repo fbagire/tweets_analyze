@@ -46,3 +46,64 @@
 2022-07-27 19:53:40,531 INFO looking up users EtudesRwanda
 2022-07-27 19:53:40,532 INFO getting ('https://api.twitter.com/1.1/users/lookup.json',) {'params': {'screen_name': 'EtudesRwanda', 'tweet_mode': 'extended'}}
 2022-07-27 19:53:40,852 INFO archived 1535192912132202498
+2022-07-28 19:33:06,515 INFO loading None profile from config C:\Users\Faith Bagire\.twarc
+2022-07-28 19:33:06,522 INFO creating http session
+2022-07-28 19:33:06,522 INFO creating OAuth1 user authentication
+2022-07-28 19:33:06,522 INFO getting ('https://api.twitter.com/1.1/account/verify_credentials.json',) {'params': {'tweet_mode': 'extended'}}
+2022-07-28 19:33:08,329 INFO connecting to filter stream for {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}
+2022-07-28 19:33:08,329 INFO posting ('https://stream.twitter.com/1.1/statuses/filter.json', {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}) {'headers': {'accept-encoding': 'deflate, gzip'}, 'stream': True}
+2022-07-28 19:33:09,745 ERROR caught http error 403 Client Error: Forbidden for url: https://stream.twitter.com/1.1/statuses/filter.json on 1 try
+2022-07-28 19:33:09,745 INFO sleeping 5
+2022-07-28 19:33:14,766 INFO connecting to filter stream for {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}
+2022-07-28 19:33:14,766 INFO posting ('https://stream.twitter.com/1.1/statuses/filter.json', {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}) {'headers': {'accept-encoding': 'deflate, gzip'}, 'stream': True}
+2022-07-28 19:33:15,646 ERROR caught http error 403 Client Error: Forbidden for url: https://stream.twitter.com/1.1/statuses/filter.json on 2 try
+2022-07-28 19:33:15,646 INFO sleeping 10
+2022-07-28 19:33:25,662 INFO connecting to filter stream for {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}
+2022-07-28 19:33:25,662 INFO posting ('https://stream.twitter.com/1.1/statuses/filter.json', {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}) {'headers': {'accept-encoding': 'deflate, gzip'}, 'stream': True}
+2022-07-28 19:33:27,072 ERROR caught http error 403 Client Error: Forbidden for url: https://stream.twitter.com/1.1/statuses/filter.json on 3 try
+2022-07-28 19:33:27,072 INFO sleeping 15
+2022-07-28 19:33:42,084 INFO connecting to filter stream for {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}
+2022-07-28 19:33:42,084 INFO posting ('https://stream.twitter.com/1.1/statuses/filter.json', {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}) {'headers': {'accept-encoding': 'deflate, gzip'}, 'stream': True}
+2022-07-28 19:33:42,987 ERROR caught http error 403 Client Error: Forbidden for url: https://stream.twitter.com/1.1/statuses/filter.json on 4 try
+2022-07-28 19:33:42,987 INFO sleeping 20
+2022-07-28 19:34:02,993 INFO connecting to filter stream for {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}
+2022-07-28 19:34:02,993 INFO posting ('https://stream.twitter.com/1.1/statuses/filter.json', {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}) {'headers': {'accept-encoding': 'deflate, gzip'}, 'stream': True}
+2022-07-28 19:34:09,566 ERROR caught http error 403 Client Error: Forbidden for url: https://stream.twitter.com/1.1/statuses/filter.json on 5 try
+2022-07-28 19:34:09,566 INFO sleeping 25
+2022-07-28 19:34:34,571 INFO connecting to filter stream for {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}
+2022-07-28 19:34:34,571 INFO posting ('https://stream.twitter.com/1.1/statuses/filter.json', {'stall_warning': True, 'include_ext_alt_text': True, 'track': 'Rusesabagina'}) {'headers': {'accept-encoding': 'deflate, gzip'}, 'stream': True}
+2022-07-28 19:34:40,236 ERROR caught http error 403 Client Error: Forbidden for url: https://stream.twitter.com/1.1/statuses/filter.json on 6 try
+2022-07-28 19:34:40,236 INFO sleeping 30
+2022-07-28 19:34:50,831 WARNING process received SIGNT, stopping
+2022-07-28 19:36:14,901 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:36:14,901 INFO creating HTTP session headers for app auth.
+2022-07-28 19:36:14,901 INFO getting ('https://api.twitter.com/2/tweets/search/stream/rules',) {}
+2022-07-28 19:36:29,644 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:36:29,644 INFO creating HTTP session headers for app auth.
+2022-07-28 19:36:38,158 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:36:38,158 INFO creating HTTP session headers for app auth.
+2022-07-28 19:36:38,158 INFO getting ('https://api.twitter.com/2/tweets/search/stream/rules',) {}
+2022-07-28 19:37:24,704 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:37:24,704 INFO creating HTTP session headers for app auth.
+2022-07-28 19:37:24,713 INFO getting ('https://api.twitter.com/2/tweets/search/stream/rules',) {}
+2022-07-28 19:37:26,486 INFO connecting to stream https://api.twitter.com/2/tweets/search/stream
+2022-07-28 19:37:26,487 INFO getting ('https://api.twitter.com/2/tweets/search/stream',) {'params': {'expansions': 'author_id,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,entities.mentions.username,attachments.poll_ids,attachments.media_keys,geo.place_id', 'tweet.fields': 'attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,public_metrics,text,possibly_sensitive,referenced_tweets,reply_settings,source,withheld', 'user.fields': 'created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld', 'media.fields': 'alt_text,duration_ms,height,media_key,preview_image_url,type,url,width,public_metrics', 'poll.fields': 'duration_minutes,end_datetime,id,options,voting_status', 'place.fields': 'contained_within,country,country_code,full_name,geo,id,name,place_type'}, 'stream': True}
+2022-07-28 19:37:26,989 WARNING caught 503 from Twitter API, sleeping 1
+2022-07-28 19:37:27,992 INFO getting ('https://api.twitter.com/2/tweets/search/stream',) {'params': {'expansions': 'author_id,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,entities.mentions.username,attachments.poll_ids,attachments.media_keys,geo.place_id', 'tweet.fields': 'attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,public_metrics,text,possibly_sensitive,referenced_tweets,reply_settings,source,withheld', 'user.fields': 'created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld', 'media.fields': 'alt_text,duration_ms,height,media_key,preview_image_url,type,url,width,public_metrics', 'poll.fields': 'duration_minutes,end_datetime,id,options,voting_status', 'place.fields': 'contained_within,country,country_code,full_name,geo,id,name,place_type'}, 'stream': True}
+2022-07-28 19:37:29,144 WARNING caught 503 from Twitter API, sleeping 4
+2022-07-28 19:37:33,155 INFO getting ('https://api.twitter.com/2/tweets/search/stream',) {'params': {'expansions': 'author_id,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,entities.mentions.username,attachments.poll_ids,attachments.media_keys,geo.place_id', 'tweet.fields': 'attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,public_metrics,text,possibly_sensitive,referenced_tweets,reply_settings,source,withheld', 'user.fields': 'created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld', 'media.fields': 'alt_text,duration_ms,height,media_key,preview_image_url,type,url,width,public_metrics', 'poll.fields': 'duration_minutes,end_datetime,id,options,voting_status', 'place.fields': 'contained_within,country,country_code,full_name,geo,id,name,place_type'}, 'stream': True}
+2022-07-28 19:37:36,018 WARNING caught 503 from Twitter API, sleeping 9
+2022-07-28 19:37:45,026 INFO getting ('https://api.twitter.com/2/tweets/search/stream',) {'params': {'expansions': 'author_id,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,entities.mentions.username,attachments.poll_ids,attachments.media_keys,geo.place_id', 'tweet.fields': 'attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,public_metrics,text,possibly_sensitive,referenced_tweets,reply_settings,source,withheld', 'user.fields': 'created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld', 'media.fields': 'alt_text,duration_ms,height,media_key,preview_image_url,type,url,width,public_metrics', 'poll.fields': 'duration_minutes,end_datetime,id,options,voting_status', 'place.fields': 'contained_within,country,country_code,full_name,geo,id,name,place_type'}, 'stream': True}
+2022-07-28 19:37:48,845 WARNING caught 503 from Twitter API, sleeping 16
+2022-07-28 19:38:04,858 INFO getting ('https://api.twitter.com/2/tweets/search/stream',) {'params': {'expansions': 'author_id,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,entities.mentions.username,attachments.poll_ids,attachments.media_keys,geo.place_id', 'tweet.fields': 'attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,public_metrics,text,possibly_sensitive,referenced_tweets,reply_settings,source,withheld', 'user.fields': 'created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld', 'media.fields': 'alt_text,duration_ms,height,media_key,preview_image_url,type,url,width,public_metrics', 'poll.fields': 'duration_minutes,end_datetime,id,options,voting_status', 'place.fields': 'contained_within,country,country_code,full_name,geo,id,name,place_type'}, 'stream': True}
+2022-07-28 19:38:05,960 WARNING caught 503 from Twitter API, sleeping 25
+2022-07-28 19:38:38,007 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:38:38,007 INFO creating HTTP session headers for app auth.
+2022-07-28 19:38:52,696 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:38:52,697 INFO creating HTTP session headers for app auth.
+2022-07-28 19:38:52,697 INFO getting ('https://api.twitter.com/2/tweets/search/stream/rules',) {}
+2022-07-28 19:39:08,836 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:39:08,836 INFO creating HTTP session headers for app auth.
+2022-07-28 19:39:08,836 INFO getting ('https://api.twitter.com/2/tweets/search/stream/rules',) {}
+2022-07-28 19:39:20,594 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2022-07-28 19:39:20,594 INFO creating HTTP session headers for app auth.
