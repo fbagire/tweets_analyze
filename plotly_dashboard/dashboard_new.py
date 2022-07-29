@@ -1,4 +1,3 @@
-import streamlit as st
 import pandas as pd
 from importlib import reload
 import plotly.express as px
@@ -9,7 +8,7 @@ reload(cld)
 
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output, State
-
+from controls import LANGUAGES, SENTIMENT
 import plotly.express as px
 import pandas as pd
 
@@ -42,16 +41,6 @@ def clean_data(df_to_clean):
 
 df_tweet = clean_data(df_tweet_og)
 
-# start graphing
-
-text_grouped = df_tweet.groupby('sentiment').count()['cleaned_text'].reset_index()
-
-fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
-                   template="plotly_white", color='sentiment')
-fig_senti.update_layout(
-    plot_bgcolor="rgba(0,0,0,0)",
-    xaxis=(dict(showgrid=False)))
-
 # sentiment summary
 df_tweet_date = df_tweet.set_index('created_at')
 df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
@@ -80,8 +69,14 @@ hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x
                       text='count', width=800)
 hashtags_top.update_traces(texttemplate='%{text:.s}')
 
-lang_lst = df_tweet.lang.dropna().unique()
-sent_lst = df_tweet.sentiment.dropna().unique()
+# lang_lst = [df_tweet.lang.dropna().unique()]
+lang_lst = [{'label': str(LANGUAGES[lang_in]),
+             'value': str(lang_in)}
+            for lang_in in LANGUAGES]
+sent_lst = [{'label': str(SENTIMENT[sent_in]),
+             'value': str(sent_in)}
+            for sent_in in SENTIMENT]
+# sent_lst = [df_tweet.sentiment.dropna().unique()]
 app.layout = html.Div(
     [
         dcc.Store(id='aggregate_data'),
@@ -96,30 +91,22 @@ app.layout = html.Div(
                     [
                         html.P('Select Original Language'),
                         dcc.Dropdown(id='lang_sel',
-                                     options=[{'label': i, 'value': i} for i in lang_lst],
-                                     value='en',
+                                     # options=[{'label': i, 'value': i} for i in lang_lst],
+                                     options=lang_lst,
+                                     value=list(LANGUAGES.keys()),
                                      multi=True,
                                      searchable=True,
                                      className="dcc_control"),
                         html.P('Select Sentiment'),
-                        # dcc.Dropdown(id='sent_sel',
-                        #              options=[{'label': i, 'value': i} for i in sent_lst],
-                        #              value='Positive',
-                        #              multi=True,
-                        #              searchable=True,
-                        #              className="dcc_control"),
                         dcc.RadioItems(id='sent_sel',
-                                       options=[{'label': i, 'value': i} for i in sent_lst],
+                                       options=sent_lst,
                                        value='Positive'),
                     ], style={'width': '50%', 'display': 'flex'}
                 ),
                 html.Div(
                     [
-                        dcc.Graph(id='hashtags_plot',
-                                  figure=hashtags_top),
-                        dcc.Graph(
-                            id='sent_bar',
-                            figure=fig_senti)
+                        dcc.Graph(id='hashtags_plot'),
+                        dcc.Graph(id='sent_bar')
                     ], style={'width': '30%', 'display': 'flex'})
             ])
     ], id="mainContainer",
@@ -136,11 +123,23 @@ def filter_dataframe(df, lang_sel):
     return dff
 
 
-@app.callback(Output('aggregate_data', 'data'),
+@app.callback(Output('sent_bar', 'figure'),
               Input('lang_sel', 'value'))
-def get_selectedf(lang_sel):
+def make_sentiment_bar(lang_sel):
     dff = filter_dataframe(df_tweet, lang_sel)
-    return dff
+    text_grouped = dff.groupby('sentiment').count()['cleaned_text'].reset_index()
+
+    fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
+                       template="plotly_white", color='sentiment')
+    fig_senti.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=(dict(showgrid=False)))
+    return fig_senti
+
+
+# def get_selectedf(lang_sel):
+#     dff = filter_dataframe(df_tweet, lang_sel)
+#     return dff
 
 
 #
