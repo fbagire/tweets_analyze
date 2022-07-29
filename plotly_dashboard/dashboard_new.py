@@ -1,16 +1,14 @@
 import pandas as pd
 from importlib import reload
-import plotly.express as px
 import clean_tweets_dataframe as cld
 import re
-
-reload(cld)
-
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output, State
 from controls import LANGUAGES, SENTIMENT
 import plotly.express as px
-import pandas as pd
+import copy
+
+reload(cld)
 
 app = Dash(__name__)
 server = app.server
@@ -48,14 +46,30 @@ df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']]
 # sentiment average per day
 sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'])
 
-# lang_lst = [df_tweet.lang.dropna().unique()]
 lang_lst = [{'label': str(LANGUAGES[lang_in]),
              'value': str(lang_in)}
             for lang_in in LANGUAGES]
 sent_lst = [{'label': str(SENTIMENT[sent_in]),
              'value': str(sent_in)}
             for sent_in in SENTIMENT]
-# sent_lst = [df_tweet.sentiment.dropna().unique()]
+
+layout = dict(
+    autosize=True,
+    automargin=True,
+    margin=dict(
+        l=30,
+        r=30,
+        b=20,
+        t=40
+    ),
+    hovermode="closest",
+    plot_bgcolor="#F9F9F9",
+    paper_bgcolor="#F9F9F9",
+    legend=dict(font=dict(size=10), orientation='h'),
+    title='Satellite Overview',
+    zoom=7,
+)
+
 app.layout = html.Div(
     [
         dcc.Store(id='aggregate_data'),
@@ -84,15 +98,18 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [
-                        dcc.Graph(id='hashtags_plot'),
-                        dcc.Graph(id='sent_bar')
-                    ], style={'width': '30%', 'height': '60%', 'display': 'flex'})
+                        dcc.Graph(id='average_pola_graph',
+                                  style={'width': '70vh', 'height': '45vh'}),
+                        dcc.Graph(id='hashtags_plot', style={'width': '65vh', 'height': '45vh'}),
+                        dcc.Graph(id='sent_bar', style={'width': '70vh', 'height': '45vh'})
+                    ], style={'display': 'flex'})
             ])
     ], id="mainContainer",
     style={
         "display": "flex",
         "flex-direction": "column"
-    })
+    }
+)
 
 
 # Helper Functions
@@ -105,10 +122,12 @@ def filter_dataframe(df, lang_sel):
 @app.callback(Output('sent_bar', 'figure'),
               Input('lang_sel', 'value'))
 def make_sentiment_bar(lang_sel):
-    dff = filter_dataframe(df_tweet, lang_sel)
-    text_grouped = dff.groupby('sentiment').count()['cleaned_text'].reset_index()
+    layout_sent = copy.deepcopy(layout)
+    df_selection = filter_dataframe(df_tweet, lang_sel)
+    text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 
     fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
+                       title='Sentiment Category Distribution',
                        template="plotly_white", color='sentiment')
     fig_senti.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
@@ -135,11 +154,26 @@ def make_hashtag_plot(lang_sel):
     hash_plotdf = pd.DataFrame(
         hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
     hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag',
-                          orientation='h',
+                          orientation='h', title='Top 10 Hashtags',
                           text='count', width=800)
     hashtags_top.update_traces(texttemplate='%{text:.s}')
 
     return hashtags_top
+
+
+@app.callback(Output('average_pola_graph', 'figure'),
+              Input('lang_sel', 'value'))
+def make_avepolarity_plot(lang_sel):
+    # sentiment summary
+    df_selection = filter_dataframe(df_tweet, lang_sel)
+    df_tweet_date = df_selection.set_index('created_at')
+    df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
+
+    # sentiment average per day
+    sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'],
+                             title='Average Polarity and Subjectivity Over Time')
+
+    return sent_over_time
 
 
 # def get_selectedf(lang_sel):
