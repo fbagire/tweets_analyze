@@ -85,7 +85,7 @@ class CleanTweets:
 
 
 if __name__ == "__main__":
-    tweet_df = pd.read_excel("processed_tweet_data.xlsx", engine='openpyxl')
+    tweet_df = pd.read_csv("processed_tweet_data.csv")
     cleaner = CleanTweets(tweet_df)
 
 """To use this class, use it's instance "cleaner" and call every needed method.
