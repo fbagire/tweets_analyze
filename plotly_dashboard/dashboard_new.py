@@ -82,29 +82,28 @@ app.layout = html.Div(
             dbc.Col(
                 [
                     dcc.Dropdown(id='lang_sel',
-                                 # options=[{'label': i, 'value': i} for i in lang_lst],
                                  options=lang_lst,
                                  value=list(LANGUAGES.keys()),
                                  multi=True,
-                                 searchable=True,
-                                 className="dcc_control")
-                ], width=2, align='left')
-        ]
+                                 searchable=True
+                                 )
+                ], width=2)
+        ], align='start'
         ),
         dbc.Row([
             dbc.Col([
                 dcc.Graph(id='average_pola_graph',
-                          style={'height': '45vh'})
+                          style={'height': '40vh'})
 
             ], width=4),
             dbc.Col([
-                dcc.Graph(id='hashtags_plot', animate=None, style={'width': '33vh', 'height': '45vh'}),
+                dcc.Graph(id='hashtags_plot', animate=None, style={'height': '40vh'}),
 
-            ], width=4),
+            ], width=5),
             dbc.Col([
-                dcc.Graph(id='sent_bar', style={'height': '45vh'})
+                dcc.Graph(id='sent_bar', style={'height': '40vh'})
 
-            ], width=3)
+            ], width=3, lg=3)
 
         ]),
 
@@ -121,9 +120,9 @@ app.layout = html.Div(
                     [
                         dbc.Col(html.Div([
                             dcc.Graph(id='mostflwd_plot',
-                                      style={'height': '45vh'}),
+                                      style={'height': '40vh'}),
                         ]
-                        ), width=5),
+                        ), width=4),
                         dbc.Col(html.Div("One of three columns")),
                         dbc.Col(html.Div("One of three columns")),
                     ]
@@ -181,7 +180,7 @@ def make_hashtag_plot(lang_sel):
         hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
     hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag',
                           orientation='h', title='Top 10 Hashtags',
-                          text='count', width=800)
+                          text='count')
     hashtags_top.update_traces(texttemplate='%{text:.s}')
     hashtags_top.layout.update(layout)
 
