@@ -11,7 +11,7 @@ import copy
 
 reload(cld)
 
-app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = Dash(external_stylesheets=[dbc.themes.DARKLY])
 server = app.server
 
 
@@ -57,50 +57,57 @@ sent_lst = [{'label': str(SENTIMENT[sent_in]),
 layout = dict(title={"yref": "paper", "y": 1, "xref": "paper", "x": 0.5, "pad": {'b': 20},
                      "yanchor": "bottom"},
               margin=dict(l=30, r=30, b=20, t=40),
+              # autosize=True,
               hovermode="closest",
-              plot_bgcolor="#F9F9F9",
-              paper_bgcolor="#F9F9F9",
-              legend=dict(font=dict(size=10), orientation='h'))
+              plot_bgcolor="#2B2A30",
+              font_color='white',
+              paper_bgcolor="#2B2A30",
+              legend=dict(font=dict(size=10)))
 
 app.layout = html.Div(
     [
-        dcc.Store(id='aggregate_data'),
+        # dcc.Store(id='aggregate_data'),
         html.Div(
             [
-                html.H2('Twitter Analysis Dashboard', style={'textAlign': 'center', 'color': '#0F562F'}),
+                html.H2('Twitter Analysis Dashboard',
+                        style={'textAlign': 'center', 'font_family': "Times New Roman", 'color': '#0F562F'}),
             ]
         ),
-        html.Div(
-            [
-                dbc.Row(
-                    [
-                        html.P('Select Original Language'),
-                        dcc.Dropdown(id='lang_sel',
-                                     # options=[{'label': i, 'value': i} for i in lang_lst],
-                                     options=lang_lst,
-                                     value=list(LANGUAGES.keys()),
-                                     multi=True,
-                                     searchable=True,
-                                     className="dcc_control")
-                    ]
-                ),
-                dbc.Row([
-                    dbc.Col([
-                        dcc.Graph(id='average_pola_graph',
-                                  style={'height': '45vh'})
+        dbc.Row([
+            dbc.Col(
+                ['Select Original Language'
 
-                    ], width=3),
-                    dbc.Col([
-                        dcc.Graph(id='hashtags_plot', style={'height': '45vh'}),
+                 ], width=2, style={'color': '#0F562F', 'font-weight': 'bold', 'textAlign': 'right'}
+            ),
+            dbc.Col(
+                [
+                    dcc.Dropdown(id='lang_sel',
+                                 # options=[{'label': i, 'value': i} for i in lang_lst],
+                                 options=lang_lst,
+                                 value=list(LANGUAGES.keys()),
+                                 multi=True,
+                                 searchable=True,
+                                 className="dcc_control")
+                ], width=2, align='left')
+        ]
+        ),
+        dbc.Row([
+            dbc.Col([
+                dcc.Graph(id='average_pola_graph',
+                          style={'height': '45vh'})
 
-                    ], width=5),
-                    dbc.Col([
-                        dcc.Graph(id='sent_bar', style={'height': '45vh'})
+            ], width=4),
+            dbc.Col([
+                dcc.Graph(id='hashtags_plot', animate=None, style={'width': '33vh', 'height': '45vh'}),
 
-                    ], width=3)
+            ], width=4),
+            dbc.Col([
+                dcc.Graph(id='sent_bar', style={'height': '45vh'})
 
-                ])
-            ]),
+            ], width=3)
+
+        ]),
+
         html.Div(
             [
                 dbc.Row(dbc.Col(html.Div(
@@ -124,10 +131,10 @@ app.layout = html.Div(
             ]
         )
     ], id="mainContainer",
-    style={
-        "display": "flex",
-        "flex-direction": "column"
-    }
+    # style={
+    #     "display": "flex",
+    #     "flex-direction": "column"
+    # }
 )
 
 
@@ -192,7 +199,6 @@ def make_avepolarity_plot(lang_sel):
     # sentiment average per day
     sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'],
                              title='Average Polarity and Subjectivity Over Time')
-    # sent_over_time.update_layout(dict1=layout)
     sent_over_time.layout.update(layout)
     return sent_over_time
 
@@ -212,14 +218,7 @@ def make_mostflwd_plots(lang_sel):
 
     most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author',
                            x='followers_count', title='Most followed Accounts', orientation='h')
-    most_flwd_plt.update_layout(title={"yref": "paper", "y": 1, "xref": "paper", "x": 0.5, "pad": {'b': 20},
-                                       "yanchor": "bottom"},
-                                margin=dict(l=30, r=30, b=20, t=40),
-                                hovermode="closest",
-                                plot_bgcolor="#F9F9F9",
-                                paper_bgcolor="#F9F9F9",
-                                legend=dict(font=dict(size=10), orientation='h')
-                                )
+    most_flwd_plt.layout.update(layout)
     return most_flwd_plt
 
 
