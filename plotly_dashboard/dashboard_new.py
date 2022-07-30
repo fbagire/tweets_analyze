@@ -72,7 +72,7 @@ app.layout = html.Div(
         ),
         html.Div(
             [
-                html.Div(
+                dbc.Row(
                     [
                         html.P('Select Original Language'),
                         dcc.Dropdown(id='lang_sel',
@@ -82,16 +82,25 @@ app.layout = html.Div(
                                      multi=True,
                                      searchable=True,
                                      className="dcc_control")
-                    ], style={'width': '50%', 'display': 'flex'}
+                    ]
                 ),
-                html.Div(
-                    [
+                dbc.Row([
+                    dbc.Col([
                         dcc.Graph(id='average_pola_graph',
-                                  style={'width': '70vh', 'height': '45vh'}),
-                        dcc.Graph(id='hashtags_plot', style={'width': '65vh', 'height': '45vh'}),
-                        dcc.Graph(id='sent_bar', style={'width': '70vh', 'height': '45vh'})
-                    ], style={'display': 'flex'})
-            ], className='row'),
+                                  style={'height': '45vh'})
+
+                    ], width=3),
+                    dbc.Col([
+                        dcc.Graph(id='hashtags_plot', style={'height': '45vh'}),
+
+                    ], width=5),
+                    dbc.Col([
+                        dcc.Graph(id='sent_bar', style={'height': '45vh'})
+
+                    ], width=3)
+
+                ])
+            ]),
         html.Div(
             [
                 dbc.Row(dbc.Col(html.Div(
@@ -124,6 +133,7 @@ app.layout = html.Div(
 
 # Helper Functions
 
+
 def filter_dataframe(df, lang_sel):
     dff = df[df['lang'].isin(lang_sel)]
     return dff
@@ -139,9 +149,7 @@ def make_sentiment_bar(lang_sel):
     fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
                        title='Sentiment Category Distribution',
                        template="plotly_white", color='sentiment')
-    # fig_senti.update_layout(
-    #     plot_bgcolor="rgba(0,0,0,0)",
-    #     xaxis=(dict(showgrid=False)))
+
     fig_senti.layout.update(layout)
     return fig_senti
 
