@@ -198,7 +198,7 @@ def make_avepolarity_plot(lang_sel):
                Input('sent_sel', 'value')])
 def make_mostflwd_plots(lang_sel, sent_sel):
     df_selection = filter_dataframe(df_tweet, lang_sel)
-    df_selection = df_selection.query('sentiment==`sent_sel`')
+    df_selection = df_selection.query('sentiment==@sent_sel')
     d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
                                                                                   ascending=True).drop_duplicates(
         subset=['original_author'], keep='first')
