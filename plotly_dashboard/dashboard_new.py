@@ -54,22 +54,13 @@ sent_lst = [{'label': str(SENTIMENT[sent_in]),
              'value': str(sent_in)}
             for sent_in in SENTIMENT]
 
-layout = dict(
-    autosize=True,
-    automargin=True,
-    margin=dict(
-        l=30,
-        r=30,
-        b=20,
-        t=40
-    ),
-    hovermode="closest",
-    plot_bgcolor="#F9F9F9",
-    paper_bgcolor="#F9F9F9",
-    legend=dict(font=dict(size=10), orientation='h'),
-    title='Satellite Overview',
-    zoom=7,
-)
+layout = dict(title={"yref": "paper", "y": 1, "xref": "paper", "x": 0.5, "pad": {'b': 20},
+                     "yanchor": "bottom"},
+              margin=dict(l=30, r=30, b=20, t=40),
+              hovermode="closest",
+              plot_bgcolor="#F9F9F9",
+              paper_bgcolor="#F9F9F9",
+              legend=dict(font=dict(size=10), orientation='h'))
 
 app.layout = html.Div(
     [
@@ -113,8 +104,10 @@ app.layout = html.Div(
                 dbc.Row(
                     [
                         dbc.Col(html.Div([
-                            dcc.Graph(id='mostflwd_plot')
-                        ]), width="auto"),
+                            dcc.Graph(id='mostflwd_plot',
+                                      style={'height': '45vh'}),
+                        ]
+                        ), width=5),
                         dbc.Col(html.Div("One of three columns")),
                         dbc.Col(html.Div("One of three columns")),
                     ]
@@ -146,9 +139,10 @@ def make_sentiment_bar(lang_sel):
     fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
                        title='Sentiment Category Distribution',
                        template="plotly_white", color='sentiment')
-    fig_senti.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=(dict(showgrid=False)))
+    # fig_senti.update_layout(
+    #     plot_bgcolor="rgba(0,0,0,0)",
+    #     xaxis=(dict(showgrid=False)))
+    fig_senti.layout.update(layout)
     return fig_senti
 
 
@@ -174,6 +168,7 @@ def make_hashtag_plot(lang_sel):
                           orientation='h', title='Top 10 Hashtags',
                           text='count', width=800)
     hashtags_top.update_traces(texttemplate='%{text:.s}')
+    hashtags_top.layout.update(layout)
 
     return hashtags_top
 
@@ -189,16 +184,17 @@ def make_avepolarity_plot(lang_sel):
     # sentiment average per day
     sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'],
                              title='Average Polarity and Subjectivity Over Time')
-
+    # sent_over_time.update_layout(dict1=layout)
+    sent_over_time.layout.update(layout)
     return sent_over_time
 
 
 @app.callback(Output('mostflwd_plot', 'figure'),
-              [Input('lang_sel', 'value'),
-               Input('sent_sel', 'value')])
-def make_mostflwd_plots(lang_sel, sent_sel):
+              [Input('lang_sel', 'value')])
+# Input('sent_sel', 'value')])
+def make_mostflwd_plots(lang_sel):
     df_selection = filter_dataframe(df_tweet, lang_sel)
-    df_selection = df_selection.query('sentiment==@sent_sel')
+    # df_selection = df_selection.query('sentiment==@sent_sel')
     d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
                                                                                   ascending=True).drop_duplicates(
         subset=['original_author'], keep='first')
@@ -207,8 +203,15 @@ def make_mostflwd_plots(lang_sel, sent_sel):
         lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
 
     most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author',
-                           x='followers_count',
-                           orientation='h')
+                           x='followers_count', title='Most followed Accounts', orientation='h')
+    most_flwd_plt.update_layout(title={"yref": "paper", "y": 1, "xref": "paper", "x": 0.5, "pad": {'b': 20},
+                                       "yanchor": "bottom"},
+                                margin=dict(l=30, r=30, b=20, t=40),
+                                hovermode="closest",
+                                plot_bgcolor="#F9F9F9",
+                                paper_bgcolor="#F9F9F9",
+                                legend=dict(font=dict(size=10), orientation='h')
+                                )
     return most_flwd_plt
 
 
