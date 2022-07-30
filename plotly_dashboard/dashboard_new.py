@@ -3,6 +3,7 @@ from importlib import reload
 import clean_tweets_dataframe as cld
 import re
 from dash import Dash, dcc, html
+import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from controls import LANGUAGES, SENTIMENT
 import plotly.express as px
@@ -10,7 +11,7 @@ import copy
 
 reload(cld)
 
-app = Dash(__name__)
+app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 
@@ -89,11 +90,7 @@ app.layout = html.Div(
                                      value=list(LANGUAGES.keys()),
                                      multi=True,
                                      searchable=True,
-                                     className="dcc_control"),
-                        html.P('Select Sentiment'),
-                        dcc.RadioItems(id='sent_sel',
-                                       options=sent_lst,
-                                       value='Positive'),
+                                     className="dcc_control")
                     ], style={'width': '50%', 'display': 'flex'}
                 ),
                 html.Div(
@@ -103,7 +100,27 @@ app.layout = html.Div(
                         dcc.Graph(id='hashtags_plot', style={'width': '65vh', 'height': '45vh'}),
                         dcc.Graph(id='sent_bar', style={'width': '70vh', 'height': '45vh'})
                     ], style={'display': 'flex'})
-            ])
+            ], className='row'),
+        html.Div(
+            [
+                dbc.Row(dbc.Col(html.Div(
+                    [
+                        "Select Sentiment",
+                        dcc.RadioItems(id='sent_sel',
+                                       options=sent_lst,
+                                       value='Positive')
+                    ]), width=6)),
+                dbc.Row(
+                    [
+                        dbc.Col(html.Div([
+                            dcc.Graph(id='mostflwd_plot')
+                        ]), width="auto"),
+                        dbc.Col(html.Div("One of three columns")),
+                        dbc.Col(html.Div("One of three columns")),
+                    ]
+                ),
+            ]
+        )
     ], id="mainContainer",
     style={
         "display": "flex",
@@ -176,12 +193,23 @@ def make_avepolarity_plot(lang_sel):
     return sent_over_time
 
 
-# def get_selectedf(lang_sel):
-#     dff = filter_dataframe(df_tweet, lang_sel)
-#     return dff
+@app.callback(Output('mostflwd_plot', 'figure'),
+              [Input('lang_sel', 'value'),
+               Input('sent_sel', 'value')])
+def make_mostflwd_plots(lang_sel, sent_sel):
+    df_selection = filter_dataframe(df_tweet, lang_sel)
+    df_selection = df_selection.query('sentiment==`sent_sel`')
+    d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
+                                                                                  ascending=True).drop_duplicates(
+        subset=['original_author'], keep='first')
 
+    d_mostflwd['username_link'] = d_mostflwd['original_author'].apply(
+        lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
 
-#
+    most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author',
+                           x='followers_count',
+                           orientation='h')
+    return most_flwd_plt
 
 
 if __name__ == '__main__':
