@@ -37,7 +37,7 @@ class CleanTweets:
         drop retweets
         """
         df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
-        # df = df.drop_duplicates(subset=['cleaned_text'])
+        df = df.drop_duplicates(subset=['original_text'])
 
         return df
 
