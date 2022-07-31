@@ -32,11 +32,12 @@ class CleanTweets:
 
         return df
 
-    def drop_duplicate(self, df: pd.DataFrame) -> pd.DataFrame:
+    def drop_retweets(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        drop duplicated rows
+        drop retweets
         """
-        df = df.drop_duplicates(subset=['cleaned_text'])
+        df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
+        # df = df.drop_duplicates(subset=['cleaned_text'])
 
         return df
 
@@ -45,8 +46,6 @@ class CleanTweets:
         convert column to datetime
         """
         df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce')
-
-        df = df[df['created_at'] >= '2020-12-31']
 
         return df
 

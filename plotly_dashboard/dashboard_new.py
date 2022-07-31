@@ -28,7 +28,7 @@ cleaner = cld.CleanTweets(df_tweet_og)
 def clean_data(df_to_clean):
     # Data Preparation and Filtering
     df_to_clean = cleaner.drop_unwanted_column(df_to_clean)
-    df_to_clean = cleaner.drop_duplicate(df_to_clean)
+    df_to_clean = cleaner.drop_retweets(df_to_clean)
     df_to_clean = cleaner.convert_to_datetime(df_to_clean)
     df_to_clean = cleaner.convert_to_numbers(df_to_clean)
     df_to_clean = cleaner.treat_special_characters(df_to_clean)

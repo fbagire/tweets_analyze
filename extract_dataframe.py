@@ -150,6 +150,16 @@ class TweetDfExtractor:
 
         return likes_count
 
+    def find_reply_count(self) -> list:
+        reply_count = []
+        for tweet in self.tweets_list:
+            try:
+                reply_count.append(tweet['public_metrics']['reply_count'])
+            except KeyError:
+                reply_count.append(0)
+
+        return reply_count
+
     def find_retweet_count(self) -> list:
 
         retweet_count = []
@@ -226,22 +236,40 @@ class TweetDfExtractor:
     def get_tweet_url(self) -> list:
         tweet_url = []
         for tweet in self.tweets_list:
-            if 'referenced_tweets' in tweet:
-                try:
-                    tweet_url.append(", ".join([url['expanded_url'] for url in tweet['entities']['urls']]))
-                except KeyError:
-                    tweet_url.append(np.nan)
+            if 'referenced_tweets' not in tweet:
+                tweet_url.append("https://twitter.com/{}/status/{}".format(tweet['author']['username'], tweet['id']))
+
+                # try:
+                #     tweet_url.append(", ".join([url['expanded_url'] for url in tweet['entities']['urls']]))
+                # except KeyError:
+                #     continue
+            elif 'in_reply_to_user' in tweet or 'referenced_tweets' in tweet:
+                # try:
+                tweet_url.append("https://twitter.com/{}/status/{}".format(tweet['author']['username'], tweet['id']))
             else:
+                # except KeyError:
                 tweet_url.append(np.nan)
+
         return tweet_url
+
+    def get_tweet_category(self) -> list:
+        tweet_type = []
+        for tweet in self.tweets_list:
+            if 'in_reply_to_user' in tweet and 'referenced_tweets' in tweet:
+                tweet_type.append('Reply')
+            elif 'referenced_tweets' in tweet and 'in_reply_to_user' not in tweet:
+                tweet_type.append('Retweet')
+            else:
+                tweet_type.append('clean_tweets_dataframe.py')
+        return tweet_type
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:
         save = True
         """required column to be generated you should be creative and add more features"""
         columns = ['created_at', 'source', 'original_text', 'cleaned_text', 'polarity', 'polarity_clean',
-                   'subjectivity', 'subjectivity_clean', 'lang', 'likes_count', 'retweet_count',
+                   'subjectivity', 'subjectivity_clean', 'lang', 'likes_count', 'reply_count', 'retweet_count',
                    'original_author', 'followers_count', 'friends_count', 'possibly_sensitive', 'hashtags',
-                   'user_mentions', 'place', 'tweet_url', 'tweet_id']
+                   'user_mentions', 'place', 'tweet_url', 'tweet_id', 'tweet_category']
 
         created_at = self.find_created_time()
         source = self.find_source()
@@ -251,6 +279,7 @@ class TweetDfExtractor:
         _, _, sentiment = self.find_sentiments(text_new)
         lang = self.find_lang()
         likes_count = self.find_likes_count()
+        reply_count = self.find_reply_count()
         retweet_count = self.find_retweet_count()
         screen_name = self.find_screen_name()
         follower_count = self.find_followers_count()
@@ -262,14 +291,16 @@ class TweetDfExtractor:
         location = self.find_location()
         tweet_url = self.get_tweet_url()
         tweet_id = self.get_tweet_id()
+        tweet_category = self.get_tweet_category()
 
         data_dic = {'created_at': created_at, 'source': source, 'original_text': text, 'cleaned_text': text_new,
                     'polarity': polarity, 'subjectivity': subjectivity, 'sentiment': sentiment, 'lang': lang,
-                    'likes_count': likes_count, 'retweet_count': retweet_count, 'original_author': screen_name,
+                    'likes_count': likes_count, 'reply_count': reply_count, 'retweet_count': retweet_count,
+                    'original_author': screen_name,
                     'followers_count': follower_count, 'friends_count': friends_count,
                     'possibly_sensitive': sensitivity, 'hashtags': hashtags, 'retweet_hashtags': retweet_hashtags,
                     'user_mentions': mentions, 'place': location,
-                    'tweet_url': tweet_url, 'tweet_id': tweet_id}
+                    'tweet_url': tweet_url, 'tweet_id': tweet_id, 'tweet_category': tweet_category}
 
         df = pd.DataFrame.from_dict(data_dic, orient='index')
         df = df.transpose()
