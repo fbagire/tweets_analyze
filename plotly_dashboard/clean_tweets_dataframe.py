@@ -36,8 +36,8 @@ class CleanTweets:
         """
         drop retweets
         """
-        df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
-        df = df.drop_duplicates(subset=['original_text'])
+        # df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
+        df = df.drop_duplicates(subset=['original_text', 'original_author'])
 
         return df
 
@@ -67,6 +67,8 @@ class CleanTweets:
         """
         df['lang'] = df['lang'].replace('in', value='kiny')
         df['lang'] = df['lang'].replace('tl', value='kiny')
+        # df['lang'] = df['lang'].replace('de', value='kiny')
+        df['lang'] = df['lang'].replace('ht', value='kiny')
 
         df.query("lang == 'en' | lang =='fr' | lang == 'kiny' ", inplace=True)
 
@@ -76,10 +78,14 @@ class CleanTweets:
         """"
         Remove special characters and redundant characters which cause one location to come out many times
         """
-        df['place'] = df['place'].str.capitalize()
+        df['place'] = df['place'].str.lower()
         df['place'] = df['place'].replace(r'^.*xico.*', value='Mexico', regex=True)
         df['place'] = df['place'].replace(r'(^.*[kK]igali.*)|(^.*wanda.*)', value='Rwanda', regex=True)
-
+        df['place'] = df['place'].replace(r'(^.*[Kk]inshasa.*)|(.*congo.*)|(.*drc.*)|(.*rdc.*)|(.*démocratique du.*)',
+                                          value='DRC Congo',
+                                          regex=True)
+        df['place'] = df['place'].replace('bukavu', 'DR Congo', regex=True)
+        df['place'] = df['place'].replace('goma', 'DR Congo', regex=True)
         return df
 
 

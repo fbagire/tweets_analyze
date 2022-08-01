@@ -34,11 +34,15 @@ def clean_data(df_to_clean):
     df_to_clean = cleaner.treat_special_characters(df_to_clean)
     df_to_clean = df_to_clean[df_to_clean.original_author != 'republikaonline']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'dwnews']
+    df_to_clean = df_to_clean[df_to_clean.original_author != '123_INFO_DE']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
 
     return df_to_clean
 
 
-df_tweet = clean_data(df_tweet_og)
+df_tweet_full = clean_data(df_tweet_og)
+df_tweet = df_tweet_full.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
 
 # sentiment summary
 df_tweet_date = df_tweet.set_index('created_at')
@@ -148,7 +152,7 @@ def filter_dataframe(df, lang_sel):
 @app.callback(Output('sent_bar', 'figure'),
               Input('lang_sel', 'value'))
 def make_sentiment_bar(lang_sel):
-    layout_sent = copy.deepcopy(layout)
+    # layout_sent = copy.deepcopy(layout)
     df_selection = filter_dataframe(df_tweet, lang_sel)
     text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 

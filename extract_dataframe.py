@@ -54,9 +54,9 @@ class TweetDfExtractor:
             #     # Store the extended tweet text if the tweet is a thread otherwise store just the text'
             #     text.append(tweet['extended_tweet']['text'])
             if 'text' in tweet.keys():
-                text.append(tweet['text'])
-            elif 'referenced_tweets' in tweet.keys():
-                text.append(tweet['referenced_tweets'][0]['text'])
+                text.append(str(tweet['text']).strip())
+            elif 'referenced_tweets' in tweet.keys() and 'in_reply_to_user' not in tweet.keys():
+                text.append(str(tweet['referenced_tweets'][0]['text']).strip())
             else:
                 text.append(np.nan)
         return text
@@ -260,7 +260,7 @@ class TweetDfExtractor:
             elif 'referenced_tweets' in tweet and 'in_reply_to_user' not in tweet:
                 tweet_type.append('Retweet')
             else:
-                tweet_type.append('clean_tweets_dataframe.py')
+                tweet_type.append('Tweet')
         return tweet_type
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:

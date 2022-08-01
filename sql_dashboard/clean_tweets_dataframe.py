@@ -36,8 +36,8 @@ class CleanTweets:
         """
         drop retweets
         """
-        df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
-        df = df.drop_duplicates(subset=['original_text'])
+        # df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
+        df = df.drop_duplicates(subset=['original_text', 'original_author'])
 
         return df
 
@@ -67,6 +67,8 @@ class CleanTweets:
         """
         df['lang'] = df['lang'].replace('in', value='kiny')
         df['lang'] = df['lang'].replace('tl', value='kiny')
+        # df['lang'] = df['lang'].replace('de', value='kiny')
+        df['lang'] = df['lang'].replace('ht', value='kiny')
 
         df.query("lang == 'en' | lang =='fr' | lang == 'kiny' ", inplace=True)
 
