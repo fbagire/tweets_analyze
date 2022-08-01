@@ -58,7 +58,7 @@ sent_lst = [{'label': str(SENTIMENT[sent_in]),
              'value': str(sent_in)}
             for sent_in in SENTIMENT]
 
-layout = dict(title={"yref": "paper", "y": 1, "xref": "paper", "x": 0.5, "pad": {'b': 20},
+layout = dict(title={"yref": "paper", "font": {'size': 12}, "y": 1, "xref": "paper", "x": 0.5, "pad": {'b': 20},
                      "yanchor": "bottom"},
               margin=dict(l=30, r=30, b=20, t=40),
               # autosize=True,
@@ -97,15 +97,15 @@ app.layout = html.Div(
         dbc.Row([
             dbc.Col([
                 dcc.Graph(id='average_pola_graph',
-                          style={'height': '40vh'})
+                          style={'height': '36vh'})
 
             ], width=4),
             dbc.Col([
-                dcc.Graph(id='hashtags_plot', animate=None, style={'height': '40vh'}),
+                dcc.Graph(id='hashtags_plot', animate=None, style={'height': '36vh'}),
 
-            ], width=5),
+            ], width=4),
             dbc.Col([
-                dcc.Graph(id='sent_bar', style={'height': '40vh'})
+                dcc.Graph(id='sent_bar', style={'height': '36vh'})
 
             ], width=3, lg=3)
 
@@ -122,12 +122,21 @@ app.layout = html.Div(
                     ]), width=6)),
                 dbc.Row(
                     [
-                        dbc.Col(html.Div([
-                            dcc.Graph(id='mostflwd_plot',
-                                      style={'height': '40vh'}),
-                        ]
-                        ), width=4),
-                        dbc.Col(html.Div("One of three columns")),
+                        dbc.Col(
+                            html.Div(
+                                [
+                                    dcc.Graph(id='mostflwd_plot',
+                                              style={'height': '36vh'}),
+                                ]
+                            ), width=4),
+                        dbc.Col(
+                            html.Div(
+                                [
+                                    dcc.Graph(id='tweet_typepie',
+                                              style={'height': '30vh'})
+
+                                ]
+                            ), width=2),
                         dbc.Col(html.Div("One of three columns")),
                     ]
                 ),
@@ -140,6 +149,13 @@ app.layout = html.Div(
     # }
 )
 
+
+# Summary Statistics
+
+# Most mentioned accounts
+# Most retweeted tweet
+# Most liked tweet
+# Type of tweet
 
 # Helper Functions
 
@@ -219,10 +235,22 @@ def make_mostflwd_plots(lang_sel):
     d_mostflwd['username_link'] = d_mostflwd['original_author'].apply(
         lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
 
-    most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 30:len(d_mostflwd) + 1], y='original_author',
+    most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 20:len(d_mostflwd) + 1], y='original_author',
                            x='followers_count', title='Most followed Accounts', orientation='h')
     most_flwd_plt.layout.update(layout)
     return most_flwd_plt
+
+
+@app.callback(Output('tweet_typepie', 'figure'),
+              [Input('lang_sel', 'value')])
+def make_type_pie(lang_sel):
+    df_selection = filter_dataframe(df_tweet_full, lang_sel)
+    # Type of tweet
+    df_type = pd.DataFrame(df_selection['tweet_category'].value_counts()).reset_index()
+    df_type.rename(columns={'index': 'tweet_type', 'tweet_category': 'count'}, inplace=True)
+    fig_type = px.pie(df_type, values='count', names='tweet_type', title='Type of Tweet')
+    fig_type.layout.update(layout)
+    return fig_type
 
 
 if __name__ == '__main__':
