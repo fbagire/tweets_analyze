@@ -60,6 +60,7 @@ sent_lst = [{'label': str(SENTIMENT[sent_in]),
 
 layout = dict(title={"yref": "paper", "font": {'size': 12}, "y": 1, "xref": "paper", "x": 0.5, "pad": {'b': 20},
                      "yanchor": "bottom"},
+              font={'size': 11},
               margin=dict(l=30, r=30, b=20, t=40),
               # autosize=True,
               hovermode="closest",
@@ -168,15 +169,15 @@ def filter_dataframe(df, lang_sel):
 @app.callback(Output('sent_bar', 'figure'),
               Input('lang_sel', 'value'))
 def make_sentiment_bar(lang_sel):
-    # layout_sent = copy.deepcopy(layout)
     df_selection = filter_dataframe(df_tweet, lang_sel)
     text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 
-    fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", orientation="v",
+    fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", text='cleaned_text', orientation="v",
                        title='Sentiment Category Distribution',
                        template="plotly_white", color='sentiment')
-
-    fig_senti.layout.update(layout)
+    layout_sent = copy.deepcopy(layout)
+    layout_sent['yaxis_title'] = "Number of Tweets"
+    fig_senti.layout.update(layout_sent)
     return fig_senti
 
 
@@ -248,7 +249,7 @@ def make_type_pie(lang_sel):
     # Type of tweet
     df_type = pd.DataFrame(df_selection['tweet_category'].value_counts()).reset_index()
     df_type.rename(columns={'index': 'tweet_type', 'tweet_category': 'count'}, inplace=True)
-    fig_type = px.pie(df_type, values='count', names='tweet_type', title='Type of Tweet')
+    fig_type = px.pie(df_type, values='count', names='tweet_type', hole=0.3, title='Type of Tweet')
     fig_type.layout.update(layout)
     return fig_type
 
