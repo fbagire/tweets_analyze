@@ -8,11 +8,16 @@ from dash.dependencies import Input, Output, State
 from controls import LANGUAGES, SENTIMENT
 import plotly.express as px
 import copy
+from app import app
 
 reload(cld)
 
-app = Dash(external_stylesheets=[dbc.themes.DARKLY])
-server = app.server
+
+# app = Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.DARKLY],
+#            meta_tags=[{'name': 'viewport',
+#                        'content': 'width=device-width, initial-scale=1.0'}])
+
+# server = app.server
 
 
 # Load  Tweets and Clean them
@@ -69,15 +74,15 @@ layout = dict(title={"yref": "paper", "font": {'size': 12}, "y": 1, "xref": "pap
               paper_bgcolor="#2B2A30",
               legend=dict(font=dict(size=10)))
 
-app.layout = html.Div(
+viz_layout = html.Div(
     [
         # dcc.Store(id='aggregate_data'),
-        html.Div(
-            [
-                html.H2('Twitter Analysis Dashboard',
-                        style={'textAlign': 'center', 'font_family': "Times New Roman", 'color': '#0F562F'}),
-            ]
-        ),
+        # html.Div(
+        #     [
+        #         html.H2('Twitter Analysis Dashboard',
+        #                 style={'textAlign': 'center', 'font_family': "Times New Roman", 'color': '#0F562F'}),
+        #     ]
+        # ),
         dbc.Row([
             dbc.Col(
                 ['Select Original Language'
@@ -92,7 +97,7 @@ app.layout = html.Div(
                                  multi=True,
                                  searchable=True
                                  )
-                ], width=2)
+                ], width=3)
         ], align='start'
         ),
         dbc.Row([
@@ -185,7 +190,8 @@ def make_sentiment_bar(lang_sel):
               Input('lang_sel', 'value'))
 def make_hashtag_plot(lang_sel):
     df_selection = filter_dataframe(df_tweet, lang_sel)
-    hashtag_df = df_selection[['original_text', 'hashtags', 'retweet_hashtags']]
+    hashtag_dfo = df_selection[['original_text', 'hashtags', 'retweet_hashtags']]
+    hashtag_df = hashtag_dfo.copy()
 
     def find_hashtags(df_tweets):
         """This function will extract hashtags"""
@@ -253,6 +259,5 @@ def make_type_pie(lang_sel):
     fig_type.layout.update(layout)
     return fig_type
 
-
-if __name__ == '__main__':
-    app.run_server(debug=True, threaded=True)
+# if __name__ == '__main__':
+#     app.run_server(debug=True, threaded=True)
