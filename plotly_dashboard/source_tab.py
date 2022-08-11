@@ -53,6 +53,11 @@ def clean_data(df_to_clean):
 df_tweet_full = clean_data(df_tweet_og)
 df_tweet = df_tweet_full.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
 
+df_tweet['username_link'] = df_tweet['original_author'].apply(
+    lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
+df_tweet['tweet_url'] = df_tweet['tweet_url'].apply(
+    lambda x: '[' + x + ']' + '(' + str(x) + ')')
+
 source_layout = html.Div(
     [
         dbc.Row(
@@ -65,12 +70,39 @@ source_layout = html.Div(
             dash_table.DataTable(
                 id='source-table',
                 data=df_tweet.to_dict('records'),
-                columns=[{'name': i, 'id': i} for i in df_tweet.columns],
-                filter_action="native",
+                columns=[
+                    {'name': i, 'id': i, 'presentation': 'markdown'} if i in ['username_link', 'tweet_url'] else {
+                        'name': i, 'id': i}
+                    for i in
+                    df_tweet.columns],
                 hidden_columns=['original_text', 'possibly_sensitive', 'retweet_hashtags', 'polarity', 'subjectivity',
                                 'tweet_category', 'tweet_id'],
-                style_cell={'color': '#2B2A30', 'textAlign': 'left'},
-                style_table={'color': '#2B2A30'},
+                style_cell={
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
+                    'maxWidth': 0,
+                    'textAlign': 'left'
+                },
+                tooltip_data=[
+                    {
+                        column: {'value': str(value), 'type': 'markdown'}
+                        for column, value in row.items()
+                    } for row in df_tweet.to_dict('records')
+                ],
+                tooltip_duration=None,
+
+                style_header={'backgroundColor': 'rgb(30,30,30)',
+                              'color': 'white'},
+
+                style_data={'backgroundColor': 'rgb(50,50,50)',
+                            'color': 'white'},
+                style_data_conditional=[{
+                    'if': {
+                        'state': 'active'
+                    },
+                    'backgroundColor': 'rgba(0, 116, 217, 0.3)',
+
+                }],
                 page_size=30,
 
             )
