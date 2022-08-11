@@ -2,9 +2,9 @@ import pandas as pd
 from importlib import reload
 import clean_tweets_dataframe as cld
 import re
-from dash import Dash, dcc, html
+from dash import dcc, html
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 from controls import LANGUAGES, SENTIMENT
 import plotly.express as px
 import copy
@@ -140,6 +140,7 @@ viz_layout = html.Div(
                 ),
             ]
         ),
+
         dcc.Store(id='store-data', data=[], storage_type='memory')
     ], id="mainContainer",
     # style={

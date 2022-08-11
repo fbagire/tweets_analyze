@@ -5,6 +5,7 @@ from app import app
 
 # Connect to the layout and callbacks of each tab
 from viz import viz_layout
+from source_tab import source_layout
 
 # from trends import trends_layout
 # from other import other_layout
@@ -16,7 +17,7 @@ app_tabs = html.Div(
             [
                 dbc.Tab(label="Visualization", tab_id="tab-viz", labelClassName="text-success font-weight-bold",
                         activeLabelClassName="text-danger"),
-                dbc.Tab(label="Trends", tab_id="tab-trends", labelClassName="text-success font-weight-bold",
+                dbc.Tab(label="Source Data", tab_id="tab-source", labelClassName="text-success font-weight-bold",
                         activeLabelClassName="text-danger"),
                 dbc.Tab(label="Other", tab_id="tab-other", labelClassName="text-success font-weight-bold",
                         activeLabelClassName="text-danger"),
@@ -45,8 +46,8 @@ app.layout = dbc.Container(
 def switch_tab(tab_chosen):
     if tab_chosen == "tab-viz":
         return viz_layout
-    # elif tab_chosen == "tab-trends":
-    #     return trends_layout
+    elif tab_chosen == "tab-source":
+        return source_layout
     # elif tab_chosen == "tab-other":
     # return other_layout
     return html.P("No Content for now...")
