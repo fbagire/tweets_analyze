@@ -55,6 +55,7 @@ df_tweet = df_tweet_full.query("tweet_category=='Tweet' or tweet_category== 'Rep
 
 df_tweet['username_link'] = df_tweet['original_author'].apply(
     lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
+
 df_tweet['tweet_url'] = df_tweet['tweet_url'].apply(
     lambda x: '[' + x + ']' + '(' + str(x) + ')')
 
@@ -83,12 +84,19 @@ source_layout = html.Div(
                     'maxWidth': 0,
                     'textAlign': 'left'
                 },
+                style_table={'overflowX': 'auto'},
+
                 tooltip_data=[
                     {
                         column: {'value': str(value), 'type': 'markdown'}
                         for column, value in row.items()
                     } for row in df_tweet.to_dict('records')
                 ],
+                css=[{
+                    'selector': '.dash-table-tooltip',
+                    'rule': 'background-color: grey; font-family: monospace; color: white'}
+                ],
+
                 tooltip_duration=None,
 
                 style_header={'backgroundColor': 'rgb(30,30,30)',
@@ -104,6 +112,12 @@ source_layout = html.Div(
 
                 }],
                 page_size=30,
+                # tooltip_conditional=[
+                #     {'if': {
+                #         'column_id': 'clean_text'
+                #     },
+                #         'backgroundColor': 'rgb(50,50,50)'
+                #     }]
 
             )
 
