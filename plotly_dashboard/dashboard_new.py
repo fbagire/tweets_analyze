@@ -213,7 +213,7 @@ def make_hashtag_plot(lang_sel):
 def make_avepolarity_plot(lang_sel):
     # sentiment summary
     df_selection = filter_dataframe(df_tweet, lang_sel)
-    df_tweet_date = df_selection.set_index('created_at')
+    df_tweet_date = df_selection.query("sentiment != 'Neutral'").set_index('created_at')
     df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
 
     # sentiment average per day
