@@ -29,7 +29,7 @@ app_tabs = html.Div(
 
 app.layout = dbc.Container(
     [
-        dbc.Row(dbc.Col(html.H2('Twitter Analysis Dashboard',
+        dbc.Row(dbc.Col(html.H3('Twitter Analysis Dashboard',
                                 style={'textAlign': 'center', 'font_family': "Times New Roman", 'color': '#0F562F'}))),
         dbc.Row(dbc.Col(app_tabs, width=12), className="mb-3"),
         html.Div(id='content', children=[])
