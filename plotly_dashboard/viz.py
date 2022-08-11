@@ -177,10 +177,7 @@ def df_language(lang_sel):
 @app.callback(Output('sent_bar', 'figure'),
               Input('store-data', 'data'))
 def make_sentiment_bar(df_selection):
-    # if not lang_sel:
-    #     raise PreventUpdate
-    # else:
-    # df_selection = filter_dataframe(df_tweet, lang_sel)
+    df_selection = pd.DataFrame(df_selection)
     text_grouped = df_selection.groupby('sentiment').count()['cleaned_text'].reset_index()
 
     fig_senti = px.bar(text_grouped, x="sentiment", y="cleaned_text", text='cleaned_text', orientation="v",
@@ -193,78 +190,68 @@ def make_sentiment_bar(df_selection):
 
 
 @app.callback(Output('hashtags_plot', 'figure'),
-              Input('lang_sel', 'value'))
-def make_hashtag_plot(lang_sel):
-    if not lang_sel:
-        raise PreventUpdate
-    else:
-        df_selection = filter_dataframe(df_tweet, lang_sel)
-        hashtag_dfo = df_selection[['original_text', 'hashtags', 'retweet_hashtags']]
-        hashtag_df = hashtag_dfo.copy()
+              Input('store-data', 'data'))
+def make_hashtag_plot(df_selection):
+    df_selection = pd.DataFrame(df_selection)
 
-        def find_hashtags(df_tweets):
-            """This function will extract hashtags"""
-            return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweets)
+    hashtag_dfo = df_selection[['original_text', 'hashtags', 'retweet_hashtags']]
+    hashtag_df = hashtag_dfo.copy()
 
-        hashtag_df['hashtag_check'] = df_selection.original_text.apply(find_hashtags)
-        hashtag_df.dropna(subset=['hashtag_check'], inplace=True)
-        tags_list = list(hashtag_df['hashtag_check'])
-        hashtags_list_df = pd.DataFrame([tag for tags_row in tags_list for tag in tags_row], columns=['hashtag'])
-        hashtags_list_df['hashtag'] = hashtags_list_df['hashtag'].str.lower()
+    def find_hashtags(df_tweets):
+        """This function will extract hashtags"""
+        return re.findall('(#[A-Za-z]+[A-Za-z0-9-_]+)', df_tweets)
 
-        hash_plotdf = pd.DataFrame(
-            hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
-        hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag',
-                              orientation='h', title='Top 10 Hashtags',
-                              text='count')
-        hashtags_top.update_traces(texttemplate='%{text:.s}')
-        hashtags_top.layout.update(layout)
+    hashtag_df['hashtag_check'] = df_selection.original_text.apply(find_hashtags)
+    hashtag_df.dropna(subset=['hashtag_check'], inplace=True)
+    tags_list = list(hashtag_df['hashtag_check'])
+    hashtags_list_df = pd.DataFrame([tag for tags_row in tags_list for tag in tags_row], columns=['hashtag'])
+    hashtags_list_df['hashtag'] = hashtags_list_df['hashtag'].str.lower()
 
-        return hashtags_top
+    hash_plotdf = pd.DataFrame(
+        hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
+    hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag',
+                          orientation='h', title='Top 10 Hashtags',
+                          text='count')
+    hashtags_top.update_traces(texttemplate='%{text:.s}')
+    hashtags_top.layout.update(layout)
+
+    return hashtags_top
 
 
 @app.callback(Output('average_pola_graph', 'figure'),
               Input('lang_sel', 'value'))
 def make_avepolarity_plot(lang_sel):
-    # sentiment summary
-    if not lang_sel:
-        raise PreventUpdate
-    else:
-        df_selection = filter_dataframe(df_tweet, lang_sel)
-        df_tweet_date = df_selection.query("sentiment != 'Neutral'").set_index('created_at')
-        df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
+    df_selection = filter_dataframe(df_tweet, lang_sel)
+    df_tweet_date = df_selection.query("sentiment != 'Neutral'").set_index('created_at')
+    df_tweet_date = df_tweet_date.resample('D').mean()[['polarity', 'subjectivity']].dropna()
 
-        # sentiment average per day
-        sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'],
-                                 title='Average Polarity and Subjectivity Over Time')
-        sent_over_time.layout.update(layout)
-        return sent_over_time
+    # sentiment average per day
+    sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'],
+                             title='Average Polarity and Subjectivity Over Time')
+    sent_over_time.layout.update(layout)
+    return sent_over_time
 
 
 @app.callback(Output('mostflwd_plot', 'figure'),
-              [Input('lang_sel', 'value')])
-# Input('sent_sel', 'value')])
-def make_mostflwd_plots(lang_sel):
-    if not lang_sel:
-        raise PreventUpdate
-    else:
-        df_selection = filter_dataframe(df_tweet, lang_sel)
-        # df_selection = df_selection.query('sentiment==@sent_sel')
-        d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
-                                                                                      ascending=True).drop_duplicates(
-            subset=['original_author'], keep='first')
+              Input('store-data', 'data'))
+def make_mostflwd_plots(df_selection):
+    df_selection = pd.DataFrame(df_selection)
+    #     # df_selection = df_selection.query('sentiment==@sent_sel')
+    d_mostflwd = df_selection[['original_author', 'followers_count']].sort_values(by='followers_count',
+                                                                                  ascending=True).drop_duplicates(
+        subset=['original_author'], keep='first')
 
-        d_mostflwd['username_link'] = d_mostflwd['original_author'].apply(
-            lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
+    d_mostflwd['username_link'] = d_mostflwd['original_author'].apply(
+        lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
 
-        most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 20:len(d_mostflwd) + 1], y='original_author',
-                               x='followers_count', title='Most followed Accounts', orientation='h')
-        most_flwd_plt.layout.update(layout)
-        return most_flwd_plt
+    most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 20:len(d_mostflwd) + 1], y='original_author',
+                           x='followers_count', title='Most followed Accounts', orientation='h')
+    most_flwd_plt.layout.update(layout)
+    return most_flwd_plt
 
 
 @app.callback(Output('tweet_typepie', 'figure'),
-              [Input('lang_sel', 'value')])
+              Input('lang_sel', 'value'))
 def make_type_pie(lang_sel):
     if not lang_sel:
         raise PreventUpdate
