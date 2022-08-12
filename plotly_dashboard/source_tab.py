@@ -69,8 +69,9 @@ source_layout = html.Div(
             [
                 dbc.Col(
                     ['Tweets as a Table'
-                     ], width=2, style={'color': '#0F562F', 'font-weight': 'bold', 'textAlign': 'right'}
+                     ], width=2, style={'color': '#0F562F', 'font-weight': 'bold', 'textAlign': 'left'}
                 )]),
+
         dbc.Row([
             dash_table.DataTable(
                 id='source-table',
@@ -85,23 +86,23 @@ source_layout = html.Div(
                 style_cell={
                     # 'overflow': 'hidden',
                     # 'textOverflow': 'ellipsis',
-                    'minWidth': '100px', 'maxWidth': '300px', 'width': '100px',
+                    'minWidth': '100px', 'maxWidth': '350px', 'width': '100px',
                     'textAlign': 'left'
                 },
-                style_table={'overflowX': 'auto', 'height': '500px', 'overflowY': 'auto'},
+                style_table={'overflowX': 'auto', 'height': '300px', 'overflowY': 'auto'},
 
-                tooltip_data=[
-                    {
-                        column: {'value': str(value), 'type': 'markdown'}
-                        for column, value in row.items()
-                    } for row in df_tweet.to_dict('records')
-                ],
-                css=[{
-                    'selector': '.dash-table-tooltip',
-                    'rule': 'background-color: grey; font-family: monospace; color: white'}
-                ],
+                # tooltip_data=[
+                #     {
+                #         column: {'value': str(value), 'type': 'markdown'}
+                #         for column, value in row.items()
+                #     } for row in df_tweet.to_dict('records')
+                # ],
+                # css=[{
+                #     'selector': '.dash-table-tooltip',
+                #     'rule': 'background-color: grey; font-family: monospace; color: white'}
+                # ],
 
-                tooltip_duration=None,
+                # tooltip_duration=None,
                 virtualization=True,
                 fixed_rows={'headers': True},
                 style_header={'backgroundColor': 'rgb(30,30,30)',
@@ -130,26 +131,9 @@ source_layout = html.Div(
                     {'if': {'column_id': 'hashtags'},
                      'width': '30%'},
                 ]
-                # page_size=30,
 
             )
 
         ])
     ]
 )
-
-# @app.callback(Output('memory-table', 'data'),
-#               Input('store-data', 'data'))
-# def get_df(data):
-#     if data is None:
-#         raise PreventUpdate
-#
-#     return pd.DataFrame(data)
-
-# dbc.Row(dbc.Col(html.Div(
-#     [
-#         "Select Sentiment",
-#         dcc.RadioItems(id='sent_sel',
-#                        options=sent_lst,
-#                        value='Positive')
-#     ]), width=6))

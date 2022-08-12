@@ -135,19 +135,24 @@ viz_layout = html.Div(
 
                                 ]
                             ), width=2),
-                        dbc.Col(html.Div("One of three columns")),
+                        dbc.Col(
+                            [
+                                dcc.Graph(id='tweet_mentions',
+                                          style={'height': '40vh'})
+                            ]
+
+                        ),
                     ]
                 ),
-            ]
-        ),
 
-        dcc.Store(id='store-data', data=[], storage_type='memory')
-    ], id="mainContainer",
-    # style={
-    #     "display": "flex",
-    #     "flex-direction": "column"
-    # }
-)
+                dcc.Store(id='store-data', data=[], storage_type='memory')
+            ], id="mainContainer",
+            # style={
+            #     "display": "flex",
+            #     "flex-direction": "column"
+            # }
+        )
+    ])
 
 
 # Summary Statistics
@@ -158,6 +163,12 @@ viz_layout = html.Div(
 # Type of tweet
 
 # Helper Functions
+
+
+def make_countdf(df, col_name, new_colname):
+    df_count = pd.DataFrame(df[col_name].value_counts(ascending=False)).reset_index()
+    df_count.rename(columns={'index': new_colname, col_name: 'count'}, inplace=True)
+    return df_count
 
 
 def filter_dataframe(df, lang_sel):
@@ -259,8 +270,28 @@ def make_type_pie(lang_sel):
     else:
         df_selection = filter_dataframe(df_tweet_full, lang_sel)
         # Type of tweet
-        df_type = pd.DataFrame(df_selection['tweet_category'].value_counts()).reset_index()
-        df_type.rename(columns={'index': 'tweet_type', 'tweet_category': 'count'}, inplace=True)
+        df_type = make_countdf(df_selection, 'tweet_category', 'tweet_type')
+        # df_type = pd.DataFrame(df_selection['tweet_category'].value_counts()).reset_index()
+        # df_type.rename(columns={'index': 'tweet_type', 'tweet_category': 'count'}, inplace=True)
         fig_type = px.pie(df_type, values='count', names='tweet_type', hole=0.3, title='Type of Tweet')
         fig_type.layout.update(layout)
         return fig_type
+
+
+@app.callback(Output('tweet_mentions', 'figure'),
+              Input('store-data', 'data'))
+def mentions_count(df_selection):
+    df_selection = pd.DataFrame(df_selection)
+    mentions = list(df_selection['user_mentions'].dropna())
+
+    mentions_ls = []
+    for i in range(len(mentions)):
+        mentions_ls.append(mentions[i].split(','))
+    mention_df = pd.DataFrame([ment for ment_row in mentions_ls for ment in ment_row], columns=['mentions'])
+    mention_df = make_countdf(mention_df, 'mentions', 'mentioned_user')
+
+    mentions_plt = px.bar(mention_df.head(20), y='mentioned_user',
+                          x='count', title='Most mentions Accounts', orientation='h')
+    mentions_plt.layout.update(layout)
+    return mentions_plt
+# [len(mention_df) - 20:len(mention_df) + 1]
