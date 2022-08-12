@@ -23,7 +23,7 @@ app_tabs = html.Div(
                         activeLabelClassName="text-danger"),
             ],
             id="tabs",
-            active_tab="tab-viz",
+            active_tab="tab-source",
         ),
     ], className="mt-3"
 )

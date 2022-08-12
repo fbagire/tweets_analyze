@@ -9,6 +9,8 @@ import pandas as pd
 from controls import LANGUAGES, SENTIMENT
 from app import app
 
+pd.options.mode.chained_assignment = None
+
 lang_lst = [{'label': str(LANGUAGES[lang_in]),
              'value': str(lang_in)}
             for lang_in in LANGUAGES]
@@ -53,8 +55,10 @@ def clean_data(df_to_clean):
 df_tweet_full = clean_data(df_tweet_og)
 df_tweet = df_tweet_full.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
 
-df_tweet['username_link'] = df_tweet['original_author'].apply(
+df_tweet['original_author'] = df_tweet['original_author'].apply(
     lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
+
+# df['ifor'] = df.apply(lambda row: x if something else y, axis=1)
 
 df_tweet['tweet_url'] = df_tweet['tweet_url'].apply(
     lambda x: '[' + x + ']' + '(' + str(x) + ')')
@@ -72,19 +76,19 @@ source_layout = html.Div(
                 id='source-table',
                 data=df_tweet.to_dict('records'),
                 columns=[
-                    {'name': i, 'id': i, 'presentation': 'markdown'} if i in ['username_link', 'tweet_url'] else {
+                    {'name': i, 'id': i, 'presentation': 'markdown'} if i in ['original_author', 'tweet_url'] else {
                         'name': i, 'id': i}
                     for i in
                     df_tweet.columns],
                 hidden_columns=['original_text', 'possibly_sensitive', 'retweet_hashtags', 'polarity', 'subjectivity',
                                 'tweet_category', 'tweet_id'],
                 style_cell={
-                    'overflow': 'hidden',
-                    'textOverflow': 'ellipsis',
-                    'maxWidth': 0,
+                    # 'overflow': 'hidden',
+                    # 'textOverflow': 'ellipsis',
+                    'minWidth': '100px', 'maxWidth': '300px', 'width': '100px',
                     'textAlign': 'left'
                 },
-                style_table={'overflowX': 'auto'},
+                style_table={'overflowX': 'auto', 'height': '500px', 'overflowY': 'auto'},
 
                 tooltip_data=[
                     {
@@ -98,12 +102,21 @@ source_layout = html.Div(
                 ],
 
                 tooltip_duration=None,
-
+                virtualization=True,
+                fixed_rows={'headers': True},
                 style_header={'backgroundColor': 'rgb(30,30,30)',
-                              'color': 'white'},
+                              'color': 'white',
+                              'font-size': '15px',
+                              },
 
                 style_data={'backgroundColor': 'rgb(50,50,50)',
-                            'color': 'white'},
+                            'color': 'white',
+                            'font-size': '13px',
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                            'lineHeight': '30px'
+
+                            },
                 style_data_conditional=[{
                     'if': {
                         'state': 'active'
@@ -111,13 +124,13 @@ source_layout = html.Div(
                     'backgroundColor': 'rgba(0, 116, 217, 0.3)',
 
                 }],
-                page_size=30,
-                # tooltip_conditional=[
-                #     {'if': {
-                #         'column_id': 'clean_text'
-                #     },
-                #         'backgroundColor': 'rgb(50,50,50)'
-                #     }]
+                style_cell_conditional=[
+                    {'if': {'column_id': 'cleaned_text'},
+                     'width': '60%'},
+                    {'if': {'column_id': 'hashtags'},
+                     'width': '30%'},
+                ]
+                # page_size=30,
 
             )
 
