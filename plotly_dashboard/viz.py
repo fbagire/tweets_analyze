@@ -166,7 +166,7 @@ viz_layout = html.Div(
 
 
 def make_countdf(df, col_name, new_colname):
-    df_count = pd.DataFrame(df[col_name].value_counts(ascending=False)).reset_index()
+    df_count = pd.DataFrame(df[col_name].value_counts(ascending=True)).reset_index()
     df_count.rename(columns={'index': new_colname, col_name: 'count'}, inplace=True)
     return df_count
 
@@ -290,8 +290,9 @@ def mentions_count(df_selection):
     mention_df = pd.DataFrame([ment for ment_row in mentions_ls for ment in ment_row], columns=['mentions'])
     mention_df = make_countdf(mention_df, 'mentions', 'mentioned_user')
 
-    mentions_plt = px.bar(mention_df.head(20), y='mentioned_user',
+    mentions_plt = px.bar(mention_df[len(mention_df) - 20:len(mention_df) + 1], y='mentioned_user',
                           x='count', title='Most mentions Accounts', orientation='h')
     mentions_plt.layout.update(layout)
+    mentions_plt.update_yaxes(type='category')
+
     return mentions_plt
-# [len(mention_df) - 20:len(mention_df) + 1]
