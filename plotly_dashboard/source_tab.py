@@ -48,6 +48,8 @@ def clean_data(df_to_clean):
     df_to_clean = df_to_clean[df_to_clean.original_author != '123_INFO_DE']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'RepDeFiFidonia']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'EUwatchers']
 
     return df_to_clean
 
@@ -58,11 +60,31 @@ df_tweet = df_tweet_full.query("tweet_category=='Tweet' or tweet_category== 'Rep
 df_tweet['original_author'] = df_tweet['original_author'].apply(
     lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
 
-# df['ifor'] = df.apply(lambda row: x if something else y, axis=1)
-
 df_tweet['tweet_url'] = df_tweet['tweet_url'].apply(
     lambda x: '[' + x + ']' + '(' + str(x) + ')')
 
+table_cols = [
+    {'name': i, 'id': i, 'presentation': 'markdown'} if i in ['original_author', 'tweet_url'] else {
+        'name': i, 'id': i}
+    for i in
+    df_tweet.columns]
+
+cols_sort = df_tweet.select_dtypes('number').columns
+
+for i, col in enumerate(table_cols):
+    if list(table_cols[i].values())[0] in cols_sort:
+        table_cols[i]['sortable'] = True
+    else:
+        table_cols[i]['sortable'] = False
+
+non_sortable_column_ids = [col['id'] for col in table_cols if col.pop('sortable') is False]
+table_css = [
+    {
+        'selector': f'th[data-dash-column="{col}"] span.column-header--sort',
+        'rule': 'display: none',
+    }
+    for col in non_sortable_column_ids
+]
 source_layout = html.Div(
     [
         dbc.Row(
@@ -76,20 +98,19 @@ source_layout = html.Div(
             dash_table.DataTable(
                 id='source-table',
                 data=df_tweet.to_dict('records'),
-                columns=[
-                    {'name': i, 'id': i, 'presentation': 'markdown'} if i in ['original_author', 'tweet_url'] else {
-                        'name': i, 'id': i}
-                    for i in
-                    df_tweet.columns],
+                columns=table_cols,
+                css=table_css,
                 hidden_columns=['original_text', 'possibly_sensitive', 'retweet_hashtags', 'polarity', 'subjectivity',
                                 'tweet_category', 'tweet_id'],
+                sort_action="native",
+                sort_mode='multi',
                 style_cell={
                     # 'overflow': 'hidden',
                     # 'textOverflow': 'ellipsis',
                     'minWidth': '100px', 'maxWidth': '350px', 'width': '100px',
                     'textAlign': 'left'
                 },
-                style_table={'overflowX': 'auto', 'height': '300px', 'overflowY': 'auto'},
+                style_table={'overflowX': 'auto', 'height': '600px', 'overflowY': 'auto'},
 
                 # tooltip_data=[
                 #     {
@@ -114,7 +135,7 @@ source_layout = html.Div(
                             'color': 'white',
                             'font-size': '13px',
                             'whiteSpace': 'normal',
-                            'height': 'auto',
+                            # 'height': 'auto',
                             'lineHeight': '30px'
 
                             },

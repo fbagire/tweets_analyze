@@ -46,6 +46,8 @@ def clean_data(df_to_clean):
     df_to_clean = df_to_clean[df_to_clean.original_author != '123_INFO_DE']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'RepDeFiFidonia']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'EUwatchers']
 
     return df_to_clean
 
