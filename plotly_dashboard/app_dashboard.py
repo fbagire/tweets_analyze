@@ -21,14 +21,16 @@ app_tabs = html.Div(
         dbc.Tabs(
             [
                 dbc.Tab(label="Visualization", tab_id="tab-viz", labelClassName="text-success font-weight-bold",
-                        activeLabelClassName="text-danger", selected_style=tab_selected_style),
+                        activeLabelClassName="fw-bold text-danger"),
                 dbc.Tab(label="Stats Summary", tab_id="tab-stats", labelClassName="text-success font-weight-bold",
-                        activeLabelClassName="text-danger", selected_style=tab_selected_style),
+                        activeLabelClassName="fw-bold text-danger"),
                 dbc.Tab(label="Source Data", tab_id="tab-source", labelClassName="text-success font-weight-bold",
-                        activeLabelClassName="text-danger", selected_style=tab_selected_style)
+                        activeLabelClassName="fw-bold")
             ],
             id="tabs",
             active_tab="tab-source",
+            persistence=True,
+            persistence_type='session'
         ),
     ], className="mt-3"
 )
@@ -36,7 +38,8 @@ app_tabs = html.Div(
 app.layout = dbc.Container(
     [
         dbc.Row(dbc.Col(html.H3('Twitter Analysis Dashboard',
-                                style={'textAlign': 'center', 'font_family': "Times New Roman", 'color': '#0F562F'}))),
+                                style={'textAlign': 'center', 'font_family': "Times new Roman", 'font_weight': 'bolder',
+                                       'color': '#0F562F'}))),
         dbc.Row(dbc.Col(app_tabs, width=12), className="mb-3"),
         html.Div(id='content', children=[])
 

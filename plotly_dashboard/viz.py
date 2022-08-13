@@ -136,7 +136,7 @@ viz_layout = html.Div(
                                               style={'height': '30vh'})
 
                                 ]
-                            ), width=2),
+                            ), width=3),
                         dbc.Col(
                             [
                                 dcc.Graph(id='tweet_mentions',

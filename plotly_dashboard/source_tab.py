@@ -130,6 +130,7 @@ source_layout = html.Div(
                 style_data={'backgroundColor': 'rgb(50,50,50)',
                             'color': 'white',
                             'font-size': '13px',
+                            'font-family': "Arial",
                             # 'whiteSpace': 'normal',
                             # 'height': 'auto',
                             # 'lineHeight': '30px'
@@ -142,27 +143,43 @@ source_layout = html.Div(
                     'backgroundColor': 'rgba(0, 116, 217, 0.3)',
 
                 }],
-                # style_cell_conditional=[
-                #     {'if': {'column_id': 'cleaned_text'},
-                #      'width': '60%'},
-                #     {'if': {'column_id': 'hashtags'},
-                #      'width': '30%'},
-                # ],
-                export_format="csv",  # This will make an export button appear
             )
 
         ]),
         dbc.Row(
             [
-                html.Div(
+                dbc.Col(
                     [
-                        html.Button("Download data", id="btn_csv"),
-                        dcc.Download(id="download-dataframe-csv"),
-                    ]
-                )
-            ], style={'textAlign': 'top'})
-    ]
-)
+                        html.Div(
+                            [
+                                html.Button("Download data", id="btn_csv"),
+                                dcc.Download(id="download-dataframe-csv"),
+                            ]
+                        )
+                    ], align='end', width=2),
+
+                dbc.Col(
+                    [
+                        dcc.Dropdown(id='sent_sel',
+                                     options=sent_lst,
+                                     value=list(SENTIMENT.keys()),
+                                     multi=True,
+                                     style={'color': 'blue'})
+                    ], width=4, align='start')
+            ]
+        )
+    ])
+
+
+@app.callback(Output('source-table', 'data'),
+              Input('sent_sel', 'value'))
+def filter_sentiment(sent_sel):
+    if not sent_sel:
+        raise PreventUpdate
+    else:
+        dff = df_tweet.copy()
+        dff = dff[dff['sentiment'].isin(sent_sel)]
+        return dff.to_dict('records')
 
 
 @app.callback(
