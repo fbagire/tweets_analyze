@@ -8,16 +8,24 @@ from viz import viz_layout
 from stats import stats_layout
 from source_tab import source_layout
 
+tab_selected_style = {
+    'borderTop': '1px solid #d6d6d6',
+    'borderBottom': '1px solid #d6d6d6',
+    'backgroundColor': '#119DFF',
+    'color': 'white',
+    'padding': '6px'
+}
+
 app_tabs = html.Div(
     [
         dbc.Tabs(
             [
                 dbc.Tab(label="Visualization", tab_id="tab-viz", labelClassName="text-success font-weight-bold",
-                        activeLabelClassName="text-danger"),
+                        activeLabelClassName="text-danger", selected_style=tab_selected_style),
                 dbc.Tab(label="Stats Summary", tab_id="tab-stats", labelClassName="text-success font-weight-bold",
-                        activeLabelClassName="text-danger"),
+                        activeLabelClassName="text-danger", selected_style=tab_selected_style),
                 dbc.Tab(label="Source Data", tab_id="tab-source", labelClassName="text-success font-weight-bold",
-                        activeLabelClassName="text-danger")
+                        activeLabelClassName="text-danger", selected_style=tab_selected_style)
             ],
             id="tabs",
             active_tab="tab-source",
