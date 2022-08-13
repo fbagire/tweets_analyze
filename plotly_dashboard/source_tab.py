@@ -79,21 +79,15 @@ for i, col in enumerate(table_cols):
 
 non_sortable_column_ids = [col['id'] for col in table_cols if col.pop('sortable') is False]
 table_css = [
-    {
-        'selector': f'th[data-dash-column="{col}"] span.column-header--sort',
-        'rule': 'display: none',
-    }
-    for col in non_sortable_column_ids
-]
+                {
+                    'selector': f'th[data-dash-column="{col}"] span.column-header--sort',
+                    'rule': 'display: none',
+                }
+                for col in non_sortable_column_ids
+            ] + [{'selector': '.dash-table-tooltip',
+                  'rule': 'background-color: grey; font-family: monospace; color: white'}]
 source_layout = html.Div(
     [
-        dbc.Row(
-            [
-                dbc.Col(
-                    ['Tweets as a Table'
-                     ], width=2, style={'color': '#0F562F', 'font-weight': 'bold', 'textAlign': 'left'}
-                )]),
-
         dbc.Row([
             dash_table.DataTable(
                 id='source-table',
@@ -107,25 +101,25 @@ source_layout = html.Div(
                 # sort_by=[],
 
                 style_cell={
-                    # 'overflow': 'hidden',
-                    # 'textOverflow': 'ellipsis',
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
                     'minWidth': '100px', 'maxWidth': '350px', 'width': '100px',
                     'textAlign': 'left'
                 },
                 style_table={'overflowX': 'auto', 'height': '300px', 'overflowY': 'auto'},
 
-                # tooltip_data=[
-                #     {
-                #         column: {'value': str(value), 'type': 'markdown'}
-                #         for column, value in row.items()
-                #     } for row in df_tweet.to_dict('records')
-                # ],
+                tooltip_data=[
+                    {
+                        column: {'value': str(value), 'type': 'markdown'}
+                        for column, value in row.items()
+                    } for row in df_tweet.to_dict('records')
+                ],
                 # css=[{
                 #     'selector': '.dash-table-tooltip',
                 #     'rule': 'background-color: grey; font-family: monospace; color: white'}
                 # ],
 
-                # tooltip_duration=None,
+                tooltip_duration=None,
                 virtualization=True,
                 fixed_rows={'headers': True},
                 style_header={'backgroundColor': 'rgb(30,30,30)',
@@ -136,9 +130,9 @@ source_layout = html.Div(
                 style_data={'backgroundColor': 'rgb(50,50,50)',
                             'color': 'white',
                             'font-size': '13px',
-                            'whiteSpace': 'normal',
-                            'height': 'auto',
-                            'lineHeight': '30px'
+                            # 'whiteSpace': 'normal',
+                            # 'height': 'auto',
+                            # 'lineHeight': '30px'
 
                             },
                 style_data_conditional=[{
@@ -148,15 +142,33 @@ source_layout = html.Div(
                     'backgroundColor': 'rgba(0, 116, 217, 0.3)',
 
                 }],
-                style_cell_conditional=[
-                    {'if': {'column_id': 'cleaned_text'},
-                     'width': '60%'},
-                    {'if': {'column_id': 'hashtags'},
-                     'width': '30%'},
-                ]
-
+                # style_cell_conditional=[
+                #     {'if': {'column_id': 'cleaned_text'},
+                #      'width': '60%'},
+                #     {'if': {'column_id': 'hashtags'},
+                #      'width': '30%'},
+                # ],
+                export_format="csv",  # This will make an export button appear
             )
 
-        ])
+        ]),
+        dbc.Row(
+            [
+                html.Div(
+                    [
+                        html.Button("Download data", id="btn_csv"),
+                        dcc.Download(id="download-dataframe-csv"),
+                    ]
+                )
+            ], style={'textAlign': 'top'})
     ]
 )
+
+
+@app.callback(
+    Output("download-dataframe-csv", "data"),
+    Input("btn_csv", "n_clicks"),
+    prevent_initial_call=True,
+)
+def func(n_clicks):
+    return dcc.send_data_frame(df_tweet.to_csv, "tweets.csv")

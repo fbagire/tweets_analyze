@@ -6,3 +6,4 @@
 *.log
 *.xlsx
 twarc.log
+*cache-directory
