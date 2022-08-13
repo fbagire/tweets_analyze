@@ -104,13 +104,15 @@ source_layout = html.Div(
                                 'tweet_category', 'tweet_id'],
                 sort_action="native",
                 sort_mode='multi',
+                # sort_by=[],
+
                 style_cell={
                     # 'overflow': 'hidden',
                     # 'textOverflow': 'ellipsis',
                     'minWidth': '100px', 'maxWidth': '350px', 'width': '100px',
                     'textAlign': 'left'
                 },
-                style_table={'overflowX': 'auto', 'height': '600px', 'overflowY': 'auto'},
+                style_table={'overflowX': 'auto', 'height': '300px', 'overflowY': 'auto'},
 
                 # tooltip_data=[
                 #     {
@@ -135,7 +137,7 @@ source_layout = html.Div(
                             'color': 'white',
                             'font-size': '13px',
                             'whiteSpace': 'normal',
-                            # 'height': 'auto',
+                            'height': 'auto',
                             'lineHeight': '30px'
 
                             },
