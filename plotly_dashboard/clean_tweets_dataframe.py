@@ -38,6 +38,8 @@ class CleanTweets:
         """
         # df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
         df = df.drop_duplicates(subset=['original_text', 'original_author'])
+        df = df[df.original_author != 'RepDeFiFidonia']
+        df = df[df.original_author != 'republikaonline']
 
         return df
 
