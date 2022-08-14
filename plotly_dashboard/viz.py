@@ -95,7 +95,7 @@ viz_layout = html.Div(
                                  options=lang_lst,
                                  value=list(LANGUAGES.keys()),
                                  multi=True,
-                                 searchable=True
+                                 style={'color': 'blue'}
                                  )
                 ], width=3)
         ], align='start'
@@ -148,19 +148,10 @@ viz_layout = html.Div(
                 ),
 
                 dcc.Store(id='store-data', data=[], storage_type='memory')
-            ], id="mainContainer",
-            # style={
-            #     "display": "flex",
-            #     "flex-direction": "column"
-            # }
+            ], id="mainContainer"
         )
     ])
 
-
-# Summary Statistics
-
-# Most retweeted tweet
-# Most liked tweet
 
 # Helper Functions
 
