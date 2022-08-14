@@ -28,7 +28,7 @@ app_tabs = html.Div(
                         activeLabelClassName="fw-bold")
             ],
             id="tabs",
-            active_tab="tab-source",
+            active_tab="tab-stats",
             persistence=True,
             persistence_type='session'
         ),

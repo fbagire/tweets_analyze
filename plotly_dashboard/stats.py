@@ -1,5 +1,4 @@
-from dash import html, dash_table, dcc, MATCH
-import plotly.express as px
+from dash import html, dash_table, dcc
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from flask_caching import Cache
@@ -8,7 +7,7 @@ from dash.dependencies import Input, Output, State
 import pandas as pd
 from controls import LANGUAGES, SENTIMENT
 from app import app
-from source_tab import table_css
+import base64
 
 pd.options.mode.chained_assignment = None
 
@@ -44,12 +43,10 @@ def clean_data(df_to_clean):
     df_to_clean = cleaner.convert_to_datetime(df_to_clean)
     df_to_clean = cleaner.convert_to_numbers(df_to_clean)
     df_to_clean = cleaner.treat_special_characters(df_to_clean)
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'republikaonline']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'dwnews']
     df_to_clean = df_to_clean[df_to_clean.original_author != '123_INFO_DE']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'RepDeFiFidonia']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'EUwatchers']
 
     return df_to_clean
@@ -75,21 +72,11 @@ table_css = [
         'rule': 'display: none',
     }
 ]
-table_layout = dict(style_header={'backgroundColor': 'rgb(30,30,30)',
-                                  'color': 'white',
-                                  'font-size': '15px'
-                                  },
-                    style_data={'backgroundColor': 'rgb(50,50,50)',
-                                'color': 'white',
-                                'font-size': '13px',
-                                'font-family': "Arial",
-                                },
-                    style_cell={
-                        'overflow': 'hidden',
-                        'textOverflow': 'ellipsis',
-                        'minWidth': '100px', 'maxWidth': '350px', 'width': '100px',
-                        'textAlign': 'left'
-                    }),
+table_layout = dict(style_header={'backgroundColor': 'rgb(30,30,30)', 'color': 'white', 'font-size': '15px'},
+                    style_data={'backgroundColor': 'rgb(50,50,50)', 'color': 'white', 'font-size': '13px',
+                                'font-family': "Arial"},
+                    style_cell={'overflow': 'hidden', 'textOverflow': 'ellipsis', 'minWidth': '100px',
+                                'maxWidth': '350px', 'width': '100px', 'textAlign': 'left'}),
 
 stats_layout = html.Div(
     [
@@ -106,7 +93,8 @@ stats_layout = html.Div(
                                      style={'color': 'blue'}
                                      )
                     ], md=4
-                )
+                ),
+                dbc.Col(html.Div("Words Cloud From Tweets"))
             ]),
         dbc.Row(
             [
@@ -122,18 +110,21 @@ stats_layout = html.Div(
                                          sort_action='native',
                                          sort_mode='multi'
 
-                                         ), md=4),
-                dbc.Col(html.Div("One of three columns"), md=4),
-            ], align='end'
-        ),
-        dbc.Row(
-            [
-                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
-                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
-                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
-                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
-            ]
-        ),
+                                         ),
+                    md=4),
+                dbc.Col(
+                    html.Div(
+                        html.Img(src=app.get_asset_url('cw_rdf.png'), width="500", height="400")
+                    ), md=4),
+            ]),
+        # dbc.Row(
+        #     [
+        #         dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+        #         dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+        #         dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+        #         dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+        #     ]
+        # ),
 
     ]
 )

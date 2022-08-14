@@ -41,12 +41,10 @@ def clean_data(df_to_clean):
     df_to_clean = cleaner.convert_to_datetime(df_to_clean)
     df_to_clean = cleaner.convert_to_numbers(df_to_clean)
     df_to_clean = cleaner.treat_special_characters(df_to_clean)
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'republikaonline']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'dwnews']
     df_to_clean = df_to_clean[df_to_clean.original_author != '123_INFO_DE']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'RepDeFiFidonia']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'EUwatchers']
 
     return df_to_clean
@@ -262,8 +260,6 @@ def make_type_pie(lang_sel):
         df_selection = filter_dataframe(df_tweet_full, lang_sel)
         # Type of tweet
         df_type = make_countdf(df_selection, 'tweet_category', 'tweet_type')
-        # df_type = pd.DataFrame(df_selection['tweet_category'].value_counts()).reset_index()
-        # df_type.rename(columns={'index': 'tweet_type', 'tweet_category': 'count'}, inplace=True)
         fig_type = px.pie(df_type, values='count', names='tweet_type', hole=0.3, title='Type of Tweet')
         fig_type.layout.update(layout)
         return fig_type
