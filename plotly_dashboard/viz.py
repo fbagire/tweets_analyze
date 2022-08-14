@@ -159,10 +159,8 @@ viz_layout = html.Div(
 
 # Summary Statistics
 
-# Most mentioned accounts
 # Most retweeted tweet
 # Most liked tweet
-# Type of tweet
 
 # Helper Functions
 
@@ -293,7 +291,7 @@ def mentions_count(df_selection):
     mention_df = make_countdf(mention_df, 'mentions', 'mentioned_user')
 
     mentions_plt = px.bar(mention_df[len(mention_df) - 20:len(mention_df) + 1], y='mentioned_user',
-                          x='count', title='Most mentions Accounts', orientation='h')
+                          x='count', title='Most mentioned Accounts', orientation='h')
     mentions_plt.layout.update(layout)
     mentions_plt.update_yaxes(type='category')
 

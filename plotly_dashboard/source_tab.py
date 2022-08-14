@@ -114,11 +114,6 @@ source_layout = html.Div(
                         for column, value in row.items()
                     } for row in df_tweet.to_dict('records')
                 ],
-                # css=[{
-                #     'selector': '.dash-table-tooltip',
-                #     'rule': 'background-color: grey; font-family: monospace; color: white'}
-                # ],
-
                 tooltip_duration=None,
                 virtualization=True,
                 fixed_rows={'headers': True},
@@ -126,15 +121,10 @@ source_layout = html.Div(
                               'color': 'white',
                               'font-size': '15px',
                               },
-
                 style_data={'backgroundColor': 'rgb(50,50,50)',
                             'color': 'white',
                             'font-size': '13px',
                             'font-family': "Arial",
-                            # 'whiteSpace': 'normal',
-                            # 'height': 'auto',
-                            # 'lineHeight': '30px'
-
                             },
                 style_data_conditional=[{
                     'if': {

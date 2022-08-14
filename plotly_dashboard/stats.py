@@ -8,6 +8,7 @@ from dash.dependencies import Input, Output, State
 import pandas as pd
 from controls import LANGUAGES, SENTIMENT
 from app import app
+from source_tab import table_css
 
 pd.options.mode.chained_assignment = None
 
@@ -60,19 +61,94 @@ df_tweet = df_tweet_full.query("tweet_category=='Tweet' or tweet_category== 'Rep
 df_tweet['original_author'] = df_tweet['original_author'].apply(
     lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
 
-df_tweet['tweet_url'] = df_tweet['tweet_url'].apply(
-    lambda x: '[' + x + ']' + '(' + str(x) + ')')
+cols_use = ['original_author', 'cleaned_text', 'likes_count', 'followers_count', 'retweet_count']
 
-table_cols = [
-    {'name': i, 'id': i, 'presentation': 'markdown'} if i in ['original_author', 'tweet_url'] else {
-        'name': i, 'id': i}
-    for i in
-    df_tweet.columns]
+columns = [{'name': 'original_author', 'id': 'original_author', 'presentation': 'markdown'},
+           {'name': 'cleaned_text', 'id': 'cleaned_text', 'type': 'numeric'},
+           {'name': 'likes_count', 'id': 'likes_count'},
+           {'name': 'followers_count', 'id': 'followers_count'},
+           {'name': 'retweet_count', 'id': 'retweet_count'}]
+
+table_css = [
+    {
+        'selector': f'th[data-dash-column="original_author"] span.column-header--sort',
+        'rule': 'display: none',
+    }
+]
+table_layout = dict(style_header={'backgroundColor': 'rgb(30,30,30)',
+                                  'color': 'white',
+                                  'font-size': '15px'
+                                  },
+                    style_data={'backgroundColor': 'rgb(50,50,50)',
+                                'color': 'white',
+                                'font-size': '13px',
+                                'font-family': "Arial",
+                                },
+                    style_cell={
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'minWidth': '100px', 'maxWidth': '350px', 'width': '100px',
+                        'textAlign': 'left'
+                    }),
 
 stats_layout = html.Div(
     [
+
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dcc.Dropdown(id='sent_sel',
+                                     options=sent_lst,
+                                     value=list(SENTIMENT.keys()),
+                                     multi=True,
+                                     placeholder='sentiment',
+                                     style={'color': 'blue'}
+                                     )
+                    ], md=4
+                )
+            ]),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dash_table.DataTable(id='tweets_per_user',
+                                         data=df_tweet.to_dict('records'),
+                                         columns=columns,
+                                         css=table_css,
+                                         style_data=table_layout[0]['style_data'],
+                                         style_header=table_layout[0]['style_header'],
+                                         style_cell=table_layout[0]['style_cell'],
+                                         style_table={'overflowX': 'auto', 'height': '300px', 'overflowY': 'auto'},
+                                         sort_action='native',
+                                         sort_mode='multi'
+
+                                         ), md=4),
+                dbc.Col(html.Div("One of three columns"), md=4),
+            ], align='end'
+        ),
+        dbc.Row(
+            [
+                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+                dbc.Col(html.Div("One of four columns"), width=6, lg=3),
+            ]
+        ),
 
     ]
 )
 
 
+@app.callback(Output('tweets_per_user', 'data'),
+              Input('sent_sel', 'value'))
+def filter_sentiment(sent_sel):
+    if not sent_sel:
+        raise PreventUpdate
+    else:
+        df_new = df_tweet.copy()
+        df_new = df_new[df_new['sentiment'].isin(sent_sel)]
+
+        dff = df_new.groupby(by=['original_author'], as_index=False).aggregate(
+            {'cleaned_text': 'count', 'likes_count': 'mean', 'followers_count': 'mean', 'retweet_count': 'mean'})
+
+        return dff.to_dict('records')
