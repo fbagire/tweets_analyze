@@ -3,6 +3,7 @@ import pandas as pd
 from textblob import TextBlob
 import numpy as np
 import re
+from cleantext import clean
 
 
 def read_json(json_tweets_file: str) -> list:
@@ -82,7 +83,7 @@ class TweetDfExtractor:
         subjectivity = []
         sentiment_class = []
         for tweet in text:
-            blob = TextBlob(tweet)
+            blob = TextBlob(clean(tweet, no_emoji=True))
             sentiment = blob.sentiment
             polarity.append(sentiment.polarity)
             subjectivity.append(sentiment.subjectivity)
@@ -266,10 +267,10 @@ class TweetDfExtractor:
     def get_tweet_df(self, save=False) -> pd.DataFrame:
         save = True
         """required column to be generated you should be creative and add more features"""
-        columns = ['created_at', 'source', 'original_text', 'cleaned_text', 'polarity', 'polarity_clean',
-                   'subjectivity', 'subjectivity_clean', 'lang', 'likes_count', 'reply_count', 'retweet_count',
-                   'original_author', 'followers_count', 'friends_count', 'possibly_sensitive', 'hashtags',
-                   'user_mentions', 'place', 'tweet_url', 'tweet_id', 'tweet_category']
+        # columns = ['created_at', 'source', 'original_text', 'cleaned_text', 'polarity', 'polarity_clean',
+        #            'subjectivity', 'subjectivity_clean', 'lang', 'likes_count', 'reply_count', 'retweet_count',
+        #            'original_author', 'followers_count', 'friends_count', 'possibly_sensitive', 'hashtags',
+        #            'user_mentions', 'place', 'tweet_url', 'tweet_id', 'tweet_category']
 
         created_at = self.find_created_time()
         source = self.find_source()
@@ -305,14 +306,14 @@ class TweetDfExtractor:
         df = pd.DataFrame.from_dict(data_dic, orient='index')
         df = df.transpose()
         if save:
-            df.to_excel('processed_tweet_data.xlsx', index=False)
+            df.to_excel('week2_new.xlsx', index=False)
             print('File Successfully Saved.!!!')
 
         return df
 
 
 if __name__ == "__main__":
-    _, tweet_list = read_json("data/tweets_flat.json")
+    _, tweet_list = read_json("data/week2_flat.json")
 
     tweety = TweetDfExtractor(tweet_list)
     df = tweety.get_tweet_df()
