@@ -2,7 +2,8 @@ import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html
 from dash.dependencies import Output, Input
 from app import app
-
+import pandas as pd
+from flask_caching import Cache
 # Connect to the layout and callbacks of each tab
 from viz import viz_layout
 from stats import stats_layout
@@ -15,6 +16,29 @@ tab_selected_style = {
     'color': 'white',
     'padding': '6px'
 }
+
+cache = Cache(app.server, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': 'cache-directory'
+})
+TIMEOUT = 60
+
+
+@cache.memoize()
+def read_data(filename):
+    # Load  Tweets and Clean them
+    df_func = pd.read_excel(filename, engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
+    return df_func
+
+
+df_selection = read_data(filename="processed_tweet_data.xlsx")
+
+# ----- Find the start and End date of the tweets under analysis ------
+end_date = df_selection.created_at.head(1)
+end_date = end_date.loc[end_date.index[0]].date()
+
+start_date = df_selection.created_at.tail(1)
+start_date = start_date.loc[start_date.index[0]].date()
 
 app_tabs = html.Div(
     [
@@ -37,9 +61,18 @@ app_tabs = html.Div(
 
 app.layout = dbc.Container(
     [
-        dbc.Row(dbc.Col(html.H3('Twitter Analysis Dashboard',
-                                style={'textAlign': 'center', 'font_family': "Times new Roman", 'font_weight': 'bolder',
-                                       'color': '#0F562F'}))),
+        dbc.Row(
+            dbc.Col(
+                [
+                    html.H3('Twitter Analysis Dashboard',
+                            style={'textAlign': 'center', 'font_family': "Times new Roman", 'font_weight': 'bolder',
+                                   'color': '#0F562F'}),
+                    html.P('Data between {} - {}'.format(start_date, end_date)
+                           )
+                ]
+            )
+        ),
+
         dbc.Row(dbc.Col(app_tabs, width=12), className="mb-3"),
         html.Div(id='content', children=[])
 
@@ -48,6 +81,7 @@ app.layout = dbc.Container(
 
 
 @app.callback(
+
     Output("content", "children"),
     [Input("tabs", "active_tab")]
 )
