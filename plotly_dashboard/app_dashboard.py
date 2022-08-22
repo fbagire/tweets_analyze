@@ -37,7 +37,7 @@ df_selection = read_data(filename="processed_tweet_data.xlsx")
 end_date = df_selection.created_at.head(1)
 end_date = end_date.loc[end_date.index[0]].date()
 
-start_date = df_selection.created_at.tail(1)
+start_date = df_selection.created_at.tail(2)
 start_date = start_date.loc[start_date.index[0]].date()
 
 app_tabs = html.Div(
@@ -67,7 +67,7 @@ app.layout = dbc.Container(
                     html.H3('Twitter Analysis Dashboard',
                             style={'textAlign': 'center', 'font_family': "Times new Roman", 'font_weight': 'bolder',
                                    'color': '#0F562F'}),
-                    html.P('Data between {} - {}'.format(start_date, end_date)
+                    html.P('Tweets between {} // {}'.format(start_date, end_date)
                            )
                 ]
             )

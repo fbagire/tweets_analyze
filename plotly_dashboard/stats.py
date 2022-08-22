@@ -94,7 +94,10 @@ stats_layout = html.Div(
                                      )
                     ], md=4
                 ),
-                dbc.Col(html.Div("Words Cloud From Tweets"))
+                dbc.Col(html.H5("Words Cloud From Tweets",
+                                style={'textAlign': 'center', 'font_family': "Times new Roman",
+                                       'font_weight': 'bolder'})),
+                dbc.Col()
             ]),
         dbc.Row(
             [
@@ -106,7 +109,8 @@ stats_layout = html.Div(
                                          style_data=table_layout[0]['style_data'],
                                          style_header=table_layout[0]['style_header'],
                                          style_cell=table_layout[0]['style_cell'],
-                                         style_table={'overflowX': 'auto', 'height': '300px', 'overflowY': 'auto'},
+                                         style_table={'overflowX': 'auto', 'height': '300px',
+                                                      'overflowY': 'auto'},
                                          sort_action='native',
                                          sort_mode='multi'
 
@@ -131,6 +135,7 @@ stats_layout = html.Div(
 
 
 @app.callback(Output('tweets_per_user', 'data'),
+
               Input('sent_sel', 'value'))
 def filter_sentiment(sent_sel):
     if not sent_sel:

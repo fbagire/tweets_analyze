@@ -51,9 +51,6 @@ class TweetDfExtractor:
         text = []
         for tweet in self.tweets_list:
 
-            # if 'extended_tweet' in tweet.keys():
-            #     # Store the extended tweet text if the tweet is a thread otherwise store just the text'
-            #     text.append(tweet['extended_tweet']['text'])
             if 'text' in tweet.keys():
                 text.append(str(tweet['text']).strip())
             elif 'referenced_tweets' in tweet.keys() and 'in_reply_to_user' not in tweet.keys():
