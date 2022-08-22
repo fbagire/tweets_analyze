@@ -31,7 +31,7 @@ def read_data(filename):
     return df_func
 
 
-df_tweet_og = read_data(filename="processed_tweet_data.xlsx")
+df_tweet_og = read_data(filename="week3_processed.xlsx")
 cleaner = cld.CleanTweets(df_tweet_og)
 
 
@@ -118,7 +118,7 @@ stats_layout = html.Div(
                     md=4),
                 dbc.Col(
                     html.Div(
-                        html.Img(src=app.get_asset_url('cw_rdf.png'), width="500", height="400")
+                        html.Img(src=app.get_asset_url('cw_rdf_week3.png'), width="500", height="400")
                     ), md=4),
             ]),
         # dbc.Row(

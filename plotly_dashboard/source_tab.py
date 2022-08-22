@@ -31,7 +31,7 @@ def read_data(filename):
     return df_func
 
 
-df_tweet_og = read_data(filename="processed_tweet_data.xlsx")
+df_tweet_og = read_data(filename="week3_processed.xlsx")
 cleaner = cld.CleanTweets(df_tweet_og)
 
 
