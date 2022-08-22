@@ -47,6 +47,9 @@ def clean_data(df_to_clean):
     df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'EUwatchers']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'IndianExpress']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'British_Airways']
+
 
     return df_to_clean
 
@@ -61,6 +64,8 @@ cols_use = ['original_author', 'cleaned_text', 'likes_count', 'followers_count',
 
 columns = [{'name': 'original_author', 'id': 'original_author', 'presentation': 'markdown'},
            {'name': 'cleaned_text', 'id': 'cleaned_text', 'type': 'numeric'},
+           {'name': 'polarity', 'id': 'polarity'},
+
            {'name': 'likes_count', 'id': 'likes_count'},
            {'name': 'followers_count', 'id': 'followers_count'},
            {'name': 'retweet_count', 'id': 'retweet_count'}]
@@ -144,6 +149,7 @@ def filter_sentiment(sent_sel):
         df_new = df_new[df_new['sentiment'].isin(sent_sel)]
 
         dff = df_new.groupby(by=['original_author'], as_index=False).aggregate(
-            {'cleaned_text': 'count', 'likes_count': 'mean', 'followers_count': 'mean', 'retweet_count': 'mean'})
+            {'cleaned_text': 'count', 'polarity': 'mean', 'likes_count': 'mean', 'followers_count': 'mean',
+             'retweet_count': 'mean'})
 
         return dff.to_dict('records')
