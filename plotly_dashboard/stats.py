@@ -3,11 +3,10 @@ from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from flask_caching import Cache
 import clean_tweets_dataframe as cld
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 import pandas as pd
 from controls import LANGUAGES, SENTIMENT
 from app import app
-import base64
 
 pd.options.mode.chained_assignment = None
 

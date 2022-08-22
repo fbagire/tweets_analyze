@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-from dash import Dash, dcc, html
+from dash import html
 from dash.dependencies import Output, Input
 from app import app
 import pandas as pd
@@ -52,7 +52,7 @@ app_tabs = html.Div(
                         activeLabelClassName="fw-bold")
             ],
             id="tabs",
-            active_tab="tab-stats",
+            active_tab="tab-viz",
             persistence=True,
             persistence_type='session'
         ),

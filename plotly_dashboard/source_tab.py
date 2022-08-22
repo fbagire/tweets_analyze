@@ -1,10 +1,9 @@
-from dash import html, dash_table, dcc, MATCH
-import plotly.express as px
+from dash import html, dash_table, dcc
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from flask_caching import Cache
 import clean_tweets_dataframe as cld
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 import pandas as pd
 from controls import LANGUAGES, SENTIMENT
 from app import app
@@ -97,6 +96,8 @@ source_layout = html.Div(
                 sort_action="native",
                 sort_mode='multi',
                 # sort_by=[],
+                filter_action="native",
+                filter_options={'case': 'insensitive'},
 
                 style_cell={
                     'overflow': 'hidden',
@@ -175,5 +176,5 @@ def filter_sentiment(sent_sel):
     Input("btn_csv", "n_clicks"),
     prevent_initial_call=True,
 )
-def func(n_clicks):
+def func():
     return dcc.send_data_frame(df_tweet.to_csv, "tweets.csv")
