@@ -4,6 +4,7 @@ from textblob import TextBlob
 import numpy as np
 import re
 from cleantext import clean
+from clean_tweets_dataframe import CleanTweets
 
 
 def read_json(json_tweets_file: str) -> list:
@@ -262,7 +263,7 @@ class TweetDfExtractor:
         return tweet_type
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:
-        save = True
+        save = False
         """required column to be generated you should be creative and add more features"""
         # columns = ['created_at', 'source', 'original_text', 'cleaned_text', 'polarity', 'polarity_clean',
         #            'subjectivity', 'subjectivity_clean', 'lang', 'likes_count', 'reply_count', 'retweet_count',
@@ -314,3 +315,15 @@ if __name__ == "__main__":
 
     tweety = TweetDfExtractor(tweet_list)
     df = tweety.get_tweet_df()
+
+    # testing if I can clean tweets from here
+
+    df_tweet = df.copy()
+    cleaner = CleanTweets(df_tweet)
+    df.dropna(subset=['cleaned_text'], inplace=True)
+    df_tweet = cleaner.drop_unwanted_column(df_tweet)
+    df_tweet = cleaner.convert_to_datetime(df_tweet)
+    df_tweet = cleaner.convert_to_numbers(df_tweet)
+    df_tweet = cleaner.treat_special_characters(df_tweet)
+    df_tweet = cleaner.remove_other_languages_tweets(df_tweet)
+    df_tweet = cleaner.drop_retweets(df_tweet)

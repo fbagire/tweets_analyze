@@ -50,7 +50,6 @@ def clean_data(df_to_clean):
     df_to_clean = df_to_clean[df_to_clean.original_author != 'IndianExpress']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'British_Airways']
 
-
     return df_to_clean
 
 
