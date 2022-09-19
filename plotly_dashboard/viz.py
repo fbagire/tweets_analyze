@@ -29,7 +29,7 @@ def read_data(filename):
     return df_func
 
 
-df_tweet_og = read_data(filename="processed_tweet_data.xlsx")
+df_tweet_og = read_data(filename="week3_processed.xlsx")
 cleaner = cld.CleanTweets(df_tweet_og)
 
 
@@ -41,11 +41,13 @@ def clean_data(df_to_clean):
     df_to_clean = cleaner.convert_to_datetime(df_to_clean)
     df_to_clean = cleaner.convert_to_numbers(df_to_clean)
     df_to_clean = cleaner.treat_special_characters(df_to_clean)
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'republikaonline']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'dwnews']
     df_to_clean = df_to_clean[df_to_clean.original_author != '123_INFO_DE']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
     df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'EUwatchers']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'IndianExpress']
+    df_to_clean = df_to_clean[df_to_clean.original_author != 'British_Airways']
 
     return df_to_clean
 
@@ -93,7 +95,7 @@ viz_layout = html.Div(
                                  options=lang_lst,
                                  value=list(LANGUAGES.keys()),
                                  multi=True,
-                                 searchable=True
+                                 style={'color': 'blue'}
                                  )
                 ], width=3)
         ], align='start'
@@ -134,7 +136,7 @@ viz_layout = html.Div(
                                               style={'height': '30vh'})
 
                                 ]
-                            ), width=2),
+                            ), width=3),
                         dbc.Col(
                             [
                                 dcc.Graph(id='tweet_mentions',
@@ -146,21 +148,10 @@ viz_layout = html.Div(
                 ),
 
                 dcc.Store(id='store-data', data=[], storage_type='memory')
-            ], id="mainContainer",
-            # style={
-            #     "display": "flex",
-            #     "flex-direction": "column"
-            # }
+            ], id="mainContainer"
         )
     ])
 
-
-# Summary Statistics
-
-# Most mentioned accounts
-# Most retweeted tweet
-# Most liked tweet
-# Type of tweet
 
 # Helper Functions
 
@@ -271,8 +262,6 @@ def make_type_pie(lang_sel):
         df_selection = filter_dataframe(df_tweet_full, lang_sel)
         # Type of tweet
         df_type = make_countdf(df_selection, 'tweet_category', 'tweet_type')
-        # df_type = pd.DataFrame(df_selection['tweet_category'].value_counts()).reset_index()
-        # df_type.rename(columns={'index': 'tweet_type', 'tweet_category': 'count'}, inplace=True)
         fig_type = px.pie(df_type, values='count', names='tweet_type', hole=0.3, title='Type of Tweet')
         fig_type.layout.update(layout)
         return fig_type
@@ -291,7 +280,7 @@ def mentions_count(df_selection):
     mention_df = make_countdf(mention_df, 'mentions', 'mentioned_user')
 
     mentions_plt = px.bar(mention_df[len(mention_df) - 20:len(mention_df) + 1], y='mentioned_user',
-                          x='count', title='Most mentions Accounts', orientation='h')
+                          x='count', title='Most mentioned Accounts', orientation='h')
     mentions_plt.layout.update(layout)
     mentions_plt.update_yaxes(type='category')
 

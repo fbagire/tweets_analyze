@@ -4,5 +4,8 @@
 *.csv
 *.txt
 *.log
-*.xlsx
 twarc.log
+*cache-directory
+week2_new.xlsx
+week3_new.xlsx
+cache-directory

@@ -19,7 +19,6 @@ class CleanTweets:
 
     def __init__(self, df: pd.DataFrame):
         self.df = df
-        print('Automation in Action...!!!')
 
     def drop_unwanted_column(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -38,7 +37,8 @@ class CleanTweets:
         """
         # df = df.query("tweet_category=='Tweet' or tweet_category== 'Reply'")
         df = df.drop_duplicates(subset=['original_text', 'original_author'])
-
+        df = df[df.original_author != 'RepDeFiFidonia']
+        df = df[df.original_author != 'republikaonline']
         return df
 
     def convert_to_datetime(self, df: pd.DataFrame) -> pd.DataFrame:
