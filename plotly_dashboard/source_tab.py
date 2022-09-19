@@ -178,5 +178,5 @@ def filter_sentiment(sent_sel):
     Input("btn_csv", "n_clicks"),
     prevent_initial_call=True,
 )
-def func():
+def func(n_clicks):
     return dcc.send_data_frame(df_tweet.to_csv, "tweets.csv")
