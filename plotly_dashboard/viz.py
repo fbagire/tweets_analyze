@@ -5,7 +5,7 @@ import re
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-from controls import LANGUAGES, SENTIMENT
+from controls import LANGUAGES, SENTIMENT, DATA_USE
 import plotly.express as px
 import copy
 from flask_caching import Cache
@@ -22,18 +22,18 @@ cache = Cache(app.server, config={
 TIMEOUT = 60
 
 
-@cache.memoize()
+# @cache.memoize()
 def read_data(filename):
     # Load  Tweets and Clean them
     df_func = pd.read_excel(filename, engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
     return df_func
 
 
-df_tweet_og = read_data(filename="week3_processed.xlsx")
+df_tweet_og = read_data(filename=DATA_USE['tweets_data'])
 cleaner = cld.CleanTweets(df_tweet_og)
 
 
-@cache.memoize()
+# @cache.memoize()
 def clean_data(df_to_clean):
     # Data Preparation and Filtering
     df_to_clean = cleaner.drop_unwanted_column(df_to_clean)

@@ -9,3 +9,7 @@ SENTIMENT = {
     'Negative': 'Negative',
     'Neutral': 'Neutral'
 }
+
+DATA_USE = {
+    'tweets_data': 'week3_processed.xlsx'
+}

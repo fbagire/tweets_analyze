@@ -8,6 +8,7 @@ from flask_caching import Cache
 from viz import viz_layout
 from stats import stats_layout
 from source_tab import source_layout
+from controls import DATA_USE
 
 tab_selected_style = {
     'borderTop': '1px solid #d6d6d6',
@@ -24,14 +25,14 @@ cache = Cache(app.server, config={
 TIMEOUT = 60
 
 
-@cache.memoize()
+# @cache.memoize()
 def read_data(filename):
     # Load  Tweets and Clean them
     df_func = pd.read_excel(filename, engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
     return df_func
 
 
-df_selection = read_data(filename="week3_processed.xlsx")
+df_selection = read_data(filename=DATA_USE['tweets_data'])
 
 # ----- Find the start and End date of the tweets under analysis ------
 end_date = df_selection.created_at.head(1)
