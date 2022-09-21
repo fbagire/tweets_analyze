@@ -327,3 +327,4 @@ if __name__ == "__main__":
     df_tweet = cleaner.treat_special_characters(df_tweet)
     df_tweet = cleaner.remove_other_languages_tweets(df_tweet)
     df_tweet = cleaner.drop_retweets(df_tweet)
+    df_tweet.to_excel('week2_new_processed.xlsx', index=False)
