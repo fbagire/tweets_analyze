@@ -10,13 +10,13 @@ from stats import stats_layout
 from source_tab import source_layout
 from controls import DATA_USE
 
-tab_selected_style = {
-    'borderTop': '1px solid #d6d6d6',
-    'borderBottom': '1px solid #d6d6d6',
-    'backgroundColor': '#119DFF',
-    'color': 'white',
-    'padding': '6px'
-}
+# tab_selected_style = {
+#     'borderTop': '1px solid #d6d6d6',
+#     'borderBottom': '1px solid #d6d6d6',
+#     'backgroundColor': '#119DFF',
+#     'color': 'white',
+#     'padding': '0px'
+# }
 
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',
