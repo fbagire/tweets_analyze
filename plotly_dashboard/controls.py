@@ -11,5 +11,5 @@ SENTIMENT = {
 }
 
 DATA_USE = {
-    'tweets_data': 'week3_processed.xlsx'
+    'tweets_data': 'week7_final.xlsx'
 }

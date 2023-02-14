@@ -100,10 +100,10 @@ class TweetDfExtractor:
 
         return created_at
 
-    def find_source(self) -> list:
-        source = [x['source'] for x in self.tweets_list]
-
-        return source
+    # def find_source(self) -> list:
+    #     source = [x['source'] for x in self.tweets_list]
+    #
+    #     return source
 
     def find_screen_name(self) -> list:
         screen_name = []
@@ -271,7 +271,7 @@ class TweetDfExtractor:
         #            'user_mentions', 'place', 'tweet_url', 'tweet_id', 'tweet_category']
 
         created_at = self.find_created_time()
-        source = self.find_source()
+        # source = self.find_source()
         text = self.find_full_text()
         text_new = self.text_cleaner(text)
         polarity, subjectivity, _ = self.find_sentiments(text_new)
@@ -292,7 +292,7 @@ class TweetDfExtractor:
         tweet_id = self.get_tweet_id()
         tweet_category = self.get_tweet_category()
 
-        data_dic = {'created_at': created_at, 'source': source, 'original_text': text, 'cleaned_text': text_new,
+        data_dic = {'created_at': created_at, 'original_text': text, 'cleaned_text': text_new,
                     'polarity': polarity, 'subjectivity': subjectivity, 'sentiment': sentiment, 'lang': lang,
                     'likes_count': likes_count, 'reply_count': reply_count, 'retweet_count': retweet_count,
                     'original_author': screen_name,
@@ -311,7 +311,7 @@ class TweetDfExtractor:
 
 
 if __name__ == "__main__":
-    _, tweet_list = read_json("data/week2_flat.json")
+    _, tweet_list = read_json("data/kagame_flat.json")
 
     tweety = TweetDfExtractor(tweet_list)
     df = tweety.get_tweet_df()
@@ -327,4 +327,5 @@ if __name__ == "__main__":
     df_tweet = cleaner.treat_special_characters(df_tweet)
     df_tweet = cleaner.remove_other_languages_tweets(df_tweet)
     df_tweet = cleaner.drop_retweets(df_tweet)
-    df_tweet.to_excel('week2_new_processed.xlsx', index=False)
+    df_tweet['created_at'] = df_tweet['created_at'].dt.tz_localize(None)
+    df_tweet.to_excel('week7_processed.xlsx', index=False)

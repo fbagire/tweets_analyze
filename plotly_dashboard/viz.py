@@ -11,15 +11,15 @@ import copy
 from flask_caching import Cache
 from dash.exceptions import PreventUpdate
 
-from app import app
+# from app import app
 
 reload(cld)
 
-cache = Cache(app.server, config={
-    'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': 'cache-directory'
-})
-TIMEOUT = 60
+# cache = Cache(app.server, config={
+#     'CACHE_TYPE': 'filesystem',
+#     'CACHE_DIR': 'cache-directory'
+# })
+# TIMEOUT = 60
 
 
 # @cache.memoize()

@@ -107,3 +107,5 @@
 2022-07-28 19:39:08,836 INFO getting ('https://api.twitter.com/2/tweets/search/stream/rules',) {}
 2022-07-28 19:39:20,594 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
 2022-07-28 19:39:20,594 INFO creating HTTP session headers for app auth.
+2023-01-11 16:12:24,870 INFO using config C:\Users\Faith Bagire\AppData\Roaming\twarc\config
+2023-01-11 16:12:24,871 INFO creating HTTP session headers for app auth.
