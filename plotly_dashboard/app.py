@@ -26,23 +26,21 @@ cache = Cache(app.server, config={
 TIMEOUT = 60
 
 
-df_selection = pd.read_excel("./week7_final.xlsx", engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
-
-# ----- Find the start and End date of the tweets under analysis ------
-end_date = df_selection.created_at.head(1)
-end_date = end_date.loc[end_date.index[0]].date()
-
-start_date = df_selection.created_at.tail(2)
-start_date = start_date.loc[start_date.index[0]].date()
-
-
+@cache.memoize()
 def read_data(filename):
     # Load  Tweets and Clean them
     df_func = pd.read_excel(filename, engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
     return df_func
 
 
-df_tweet_og = pd.read_excel("./week7_final.xlsx", engine='openpyxl', index_col=0, dtype={'tweet_id': 'str'})
+df_tweet_og = read_data("./week7_final.xlsx")
+
+# ----- Find the start and End date of the tweets under analysis ------
+end_date = df_tweet_og.created_at.head(1)
+end_date = end_date.loc[end_date.index[0]].date()
+start_date = df_tweet_og.created_at.tail(2)
+start_date = start_date.loc[start_date.index[0]].date()
+
 cleaner = cld.CleanTweets(df_tweet_og)
 
 
@@ -194,41 +192,34 @@ def switch_tab(tab_chosen):
     if tab_chosen == "tab-viz":
         return html.Div(
             [
-
-                dbc.Row([
-                    dbc.Col(
-                        ['Select Original Language'
-
-                         ], width=2, style={'color': '#0F562F', 'font-weight': 'bold', 'textAlign': 'right'}
-                    ),
-                    dbc.Col(
-                        [
-                            dcc.Dropdown(id='lang_sel',
-                                         options=lang_lst,
-                                         value=list(LANGUAGES.keys()),
-                                         multi=True,
-                                         style={'color': 'blue'}
-                                         )
-                        ], width=3)
-                ], align='start'
-                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            ['Select Original Language'],
+                            width=2, style={'color': '#0F562F', 'font-weight': 'bold', 'textAlign': 'right'}
+                        ),
+                        dbc.Col(
+                            [
+                                dcc.Dropdown(id='lang_sel',
+                                             options=lang_lst,
+                                             value=list(LANGUAGES.keys()),
+                                             multi=True,
+                                             style={'color': 'blue'}
+                                             )
+                            ], width=3)
+                    ], align='start'),
                 dbc.Row([
                     dbc.Col([
                         dcc.Graph(id='average_pola_graph',
                                   style={'height': '36vh'})
-
                     ], width=4),
                     dbc.Col([
                         dcc.Graph(id='hashtags_plot', animate=None, style={'height': '36vh'}),
-
                     ], width=4),
                     dbc.Col([
                         dcc.Graph(id='sent_bar', style={'height': '36vh'})
-
                     ], width=3, lg=3)
-
                 ]),
-
                 html.Div(
                     [
                         html.Hr(),
@@ -475,13 +466,9 @@ def make_avepolarity_plot(lang_sel):
               Input('store-data', 'data'))
 def make_mostflwd_plots(df_selection):
     df_selection = pd.DataFrame(df_selection)
-    #     # df_selection = df_selection.query('sentiment==@sent_sel')
     d_mostflwd = df_selection[['original_author1', 'followers_count']].sort_values(by='followers_count',
                                                                                    ascending=True).drop_duplicates(
         subset=['original_author1'], keep='first')
-
-    d_mostflwd['username_link'] = d_mostflwd['original_author1'].apply(
-        lambda x: '[' + x + ']' + '(https://twitter.com/' + str(x) + ')')
 
     most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 20:len(d_mostflwd) + 1], y='original_author1',
                            x='followers_count', title='Most followed Accounts', orientation='h')
