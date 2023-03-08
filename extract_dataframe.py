@@ -3,6 +3,8 @@ import pandas as pd
 from textblob import TextBlob
 import numpy as np
 import re
+import time
+import pygsheets
 from cleantext import clean
 from clean_tweets_dataframe import CleanTweets
 
@@ -71,7 +73,8 @@ class TweetDfExtractor:
             tweet_text = re.sub("http\S+", "", tweet_text)
             tweet_text = re.sub(r"www.\S+", "", tweet_text)
             tweet_text = re.sub("^ ", "", tweet_text)
-
+            # remove leading and trailing strips
+            tweet_text = tweet_text.strip()
             clean_text.append(tweet_text)
         return clean_text
 
@@ -310,22 +313,41 @@ class TweetDfExtractor:
         return df
 
 
+gc = pygsheets.authorize(service_file='tweet-auto-01-833e318c05c8.json')
+
+
+def translate_pygs():
+    sheet = gc.open('make_trans')[0]
+    df_trans = df_tweet.query("lang=='fr'| lang =='kiny'")[['original_text', 'cleaned_text', 'lang']]
+    sheet.set_dataframe(df_trans, start='A1', copy_index=True)
+    time.sleep(30)
+    sheet.update_value('E1', 'translation')
+    sheet.update_value('A1', 'index')
+    df_list = sheet.get_all_values(include_tailing_empty=False, include_tailing_empty_rows=False)
+    dd = pd.DataFrame(df_list[1:], columns=df_list[0])
+    dd = dd[:len(df_trans)]
+    dd['index'] = dd['index'].astype('int')
+    df_tweet.loc[df_trans.index, 'cleaned_text'] = dd.set_index('index')['translation']
+    df_tweet.loc[df_trans.index, 'sentiment'] = df_tweet.loc[df_trans.index, 'cleaned_text'].apply(
+        lambda x: 'Positive' if TextBlob(clean(x, no_emoji=True)).sentiment.polarity > 0 else
+        ('Negative' if TextBlob(clean(x, no_emoji=True)).
+         sentiment.polarity < 0 else 'Neutral'))
+
+
 if __name__ == "__main__":
     _, tweet_list = read_json("data/kagame_flat.json")
 
     tweety = TweetDfExtractor(tweet_list)
     df = tweety.get_tweet_df()
-
-    # testing if I can clean tweets from here
-
+    df.dropna(subset=['cleaned_text'], inplace=True)
     df_tweet = df.copy()
     cleaner = CleanTweets(df_tweet)
-    df.dropna(subset=['cleaned_text'], inplace=True)
     df_tweet = cleaner.drop_unwanted_column(df_tweet)
     df_tweet = cleaner.convert_to_datetime(df_tweet)
     df_tweet = cleaner.convert_to_numbers(df_tweet)
     df_tweet = cleaner.treat_special_characters(df_tweet)
     df_tweet = cleaner.remove_other_languages_tweets(df_tweet)
     df_tweet = cleaner.drop_retweets(df_tweet)
+    translate_pygs()
     df_tweet['created_at'] = df_tweet['created_at'].dt.tz_localize(None)
-    df_tweet.to_excel('week7_processed.xlsx', index=False)
+    df_tweet.to_excel('week7_processednew.xlsx', index=False)

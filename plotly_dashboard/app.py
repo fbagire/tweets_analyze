@@ -10,6 +10,9 @@ import copy
 from dash.exceptions import PreventUpdate
 from dash import Dash
 import dash_bootstrap_components as dbc
+from wordcloud import WordCloud, STOPWORDS
+from cleantext import clean
+import matplotlib.pyplot as plt
 
 pd.options.mode.chained_assignment = None
 
@@ -43,6 +46,9 @@ start_date = start_date.loc[start_date.index[0]].date()
 
 cleaner = cld.CleanTweets(df_tweet_og)
 
+wrong_auth = ['dwnews', '123_INFO_DE', 'rogue_corq', 'Noticieros_MEX', 'EUwatchers', 'IndianExpress', 'IndianExpress',
+              'British_Airways']
+
 
 @cache.memoize()
 def clean_data(df_to_clean):
@@ -52,14 +58,7 @@ def clean_data(df_to_clean):
     df_to_clean = cleaner.convert_to_datetime(df_to_clean)
     df_to_clean = cleaner.convert_to_numbers(df_to_clean)
     df_to_clean = cleaner.treat_special_characters(df_to_clean)
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'dwnews']
-    df_to_clean = df_to_clean[df_to_clean.original_author != '123_INFO_DE']
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'rogue_corq']
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'Noticieros_MEX']
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'EUwatchers']
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'IndianExpress']
-    df_to_clean = df_to_clean[df_to_clean.original_author != 'British_Airways']
-
+    df_to_clean = df_to_clean[~df_to_clean['original_author'].isin(wrong_auth)]
     return df_to_clean
 
 
@@ -143,6 +142,22 @@ table_css = [
             ] + [{'selector': '.dash-table-tooltip',
                   'rule': 'background-color: grey; font-family: monospace; color: white'}]
 
+# text Preprocessing
+df_tweet['cleaned_text'] = df_tweet['cleaned_text'].apply(lambda x: clean(x,
+                                                                          no_emoji=True, lower=True,
+                                                                          no_punct=True,
+                                                                          no_line_breaks=True,
+                                                                          strip_lines=True,
+                                                                          no_currency_symbols=True))
+
+all_words = ' '.join(df_tweet.cleaned_text.values)
+
+wordcloud_obj = WordCloud(width=1000, height=600, stopwords=STOPWORDS).generate(all_words)
+plt.figure(figsize=(10, 5))
+plt.axis('off')
+fgg = plt.imshow(wordcloud_obj)
+fgg.figure.savefig('cw_rdf.png', bbox_inches='tight', pad_inches=0)
+
 app_tabs = html.Div(
     [
         dbc.Tabs(
@@ -164,17 +179,22 @@ app_tabs = html.Div(
 
 app.layout = dbc.Container(
     [
-        dbc.Row(
+        dbc.Row([
             dbc.Col(
                 [
                     html.H3('Twitter Analysis Dashboard',
-                            style={'textAlign': 'center', 'font_family': "Times new Roman", 'font_weight': 'bolder',
-                                   'color': '#0F562F'}),
-                    html.P('Tweets between {} // {}'.format(start_date, end_date)
-                           )
+                            style={'textAlign': 'center', 'font_family': "Times new Roman", 'font_weight': 900,
+                                   'color': '#0F562F'})
+                ]
+            ),
+            dbc.Col(
+                [
+                    html.A('Contact Author', href='https://www.linkedin.com/in/fbagire/'),
+                    html.Br(),
+                    html.A('Tweets between {} :: {}'.format(start_date, end_date))
                 ]
             )
-        ),
+        ]),
 
         dbc.Row(dbc.Col(app_tabs, width=12), className="mb-3"),
         html.Div(id='content', children=[])
@@ -372,7 +392,7 @@ def switch_tab(tab_chosen):
                             md=4),
                         dbc.Col(
                             html.Div(
-                                html.Img(src=app.get_asset_url('cw_rdf.png'), width="500", height="400")
+                                html.Img(src=app.get_asset_url('assets/cw_rdf.png'), width="500", height="400")
                             ), md=4),
                     ]),
             ]
@@ -415,7 +435,7 @@ def make_sentiment_bar(df_selection):
                        template="plotly_white", color='sentiment')
     layout_sent = copy.deepcopy(layout)
     layout_sent['yaxis_title'] = "Number of Tweets"
-    fig_senti.layout.update(layout_sent)
+    fig_senti.update_layout(layout_sent)
     return fig_senti
 
 
@@ -437,13 +457,15 @@ def make_hashtag_plot(df_selection):
     hashtags_list_df = pd.DataFrame([tag for tags_row in tags_list for tag in tags_row], columns=['hashtag'])
     hashtags_list_df['hashtag'] = hashtags_list_df['hashtag'].str.lower()
 
-    hash_plotdf = pd.DataFrame(
-        hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
-    hashtags_top = px.bar(hash_plotdf[len(hash_plotdf) - 10:len(hash_plotdf) + 1], x='count', y='hashtag',
-                          orientation='h', title='Top 10 Hashtags',
+    hash_plotdf = pd.DataFrame(hashtags_list_df.value_counts(ascending=True), columns=['count']).reset_index()
+    hashtags_top = px.bar(hash_plotdf.tail(10),
+                          x='count',
+                          y='hashtag',
+                          orientation='h',
+                          title='Top 10 Hashtags',
                           text='count')
     hashtags_top.update_traces(texttemplate='%{text:.s}')
-    hashtags_top.layout.update(layout)
+    hashtags_top.update_layout(layout)
 
     return hashtags_top
 
@@ -457,8 +479,9 @@ def make_avepolarity_plot(lang_sel):
 
     # sentiment average per day
     sent_over_time = px.line(df_tweet_date, x=df_tweet_date.index, y=['polarity', 'subjectivity'],
+                             labels={'value': 'Sentiment', 'created_at': 'Date'},
                              title='Average Polarity and Subjectivity Over Time')
-    sent_over_time.layout.update(layout)
+    sent_over_time.update_layout(layout)
     return sent_over_time
 
 
@@ -469,10 +492,10 @@ def make_mostflwd_plots(df_selection):
     d_mostflwd = df_selection[['original_author1', 'followers_count']].sort_values(by='followers_count',
                                                                                    ascending=True).drop_duplicates(
         subset=['original_author1'], keep='first')
-
-    most_flwd_plt = px.bar(d_mostflwd[len(d_mostflwd) - 20:len(d_mostflwd) + 1], y='original_author1',
-                           x='followers_count', title='Most followed Accounts', orientation='h')
-    most_flwd_plt.layout.update(layout)
+    most_flwd_plt = px.bar(d_mostflwd.tail(20), y='original_author1',
+                           x='followers_count', title='Most followed Accounts', orientation='h',
+                           labels={'original_author1': 'Author', 'followers_count': 'Number of Followers'})
+    most_flwd_plt.update_layout(layout)
     return most_flwd_plt
 
 
@@ -486,7 +509,7 @@ def make_type_pie(lang_sel):
         # Type of tweet
         df_type = make_countdf(df_selection, 'tweet_category', 'tweet_type')
         fig_type = px.pie(df_type, values='count', names='tweet_type', hole=0.3, title='Type of Tweet')
-        fig_type.layout.update(layout)
+        fig_type.update_layout(layout)
         return fig_type
 
 
@@ -502,9 +525,10 @@ def mentions_count(df_selection):
     mention_df = pd.DataFrame([ment for ment_row in mentions_ls for ment in ment_row], columns=['mentions'])
     mention_df = make_countdf(mention_df, 'mentions', 'mentioned_user')
 
-    mentions_plt = px.bar(mention_df[len(mention_df) - 20:len(mention_df) + 1], y='mentioned_user',
-                          x='count', title='Most mentioned Accounts', orientation='h')
-    mentions_plt.layout.update(layout)
+    mentions_plt = px.bar(mention_df.tail(20), y='mentioned_user',
+                          x='count', title='Most mentioned Accounts', orientation='h',
+                          labels={'mentioned_user': 'User mentioned', 'count': 'Number of Mentions'})
+    mentions_plt.update_layout(layout)
     mentions_plt.update_yaxes(type='category')
 
     return mentions_plt
@@ -531,9 +555,8 @@ def func():
 
 
 @app.callback(Output('tweets_per_user', 'data'),
-
               Input('sent_sel', 'value'))
-def filter_sentiment(sent_sel):
+def filter_sentimentb(sent_sel):
     if not sent_sel:
         raise PreventUpdate
     else:
